@@ -1,0 +1,39 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# all methods for all paths
+OPTIONS /                           controllers.OptionsController.rootOptions
+OPTIONS /*url                       controllers.OptionsController.options(url: String)
+
+POST    /login                      controllers.LoginController.login
+
+# Users
+GET     /user/me                    controllers.UserController.getMe()
+GET     /user/:username             controllers.UserController.getByUsername(username: String)
+# GET     /user/:username/password    controllers.UserController.changePassword(username: String)
+
+# Documents
+GET     /document/:id                           controllers.DocumentController.getById(id: Int)
+PUT     /document/:id/description               controllers.DocumentController.patchDescription(id: Int)
+PUT     /document/:id/name                      controllers.DocumentController.patchName(id: Int)
+PUT     /document/:id/archiving-complete        controllers.DocumentController.archivingComplete(id: Int)
+PUT     /document/:id/action-required           controllers.DocumentController.actionRequired(id: Int)
+PUT     /document/:id/follow-up-timestamp       controllers.DocumentController.setFollowup(id: Int)
+DELETE  /document/:id/follow-up-timestamp       controllers.DocumentController.clearFollowup(id: Int)
+PUT     /document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.addTag(id: Int, tag: String)
+DELETE  /document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.deleteTag(id: Int, tag: String)
+POST    /document/:id/comments                  controllers.DocumentController.addComment(id: Int)
+POST    /document/:id/links                     controllers.DocumentController.addLink(id: Int)
+GET     /documents/attention                    controllers.DocumentController.attention()
+GET     /documents/meta                         controllers.MetaController.documentsMeta()
+GET     /documents                              controllers.DocumentController.search(q: String, fromArchiveTimestamp: Option[Long], toArchiveTimestamp: Option[Long], fromModificationTimestamp: Option[Long], toModificationTime: Option[Long], offset: Option[Int], limit: Option[Int])
+
+# Activities
+GET     /activities                 controllers.ActivitiesController.activities
+
+# Tags
+GET     /tags                       controllers.TagController.search(q: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

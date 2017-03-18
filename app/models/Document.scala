@@ -1,0 +1,65 @@
+package models
+
+import java.time.LocalDateTime
+
+import db.Tables.{DocumentRow, DtagRow, UserRow}
+import play.api.libs.json.Json
+
+/**
+  * Created by simfischer on 3/9/17.
+  */
+case class Document(id: Int,
+                    name: String,
+                    description: Option[String],
+
+                    owner: Option[User],
+
+                    archiveTimestamp: Long,
+                    modificationTimestamp: Long,
+                    followUpTimestamp: Option[Long],
+
+                    archivingComplete: Boolean,
+                    actionRequired: Boolean,
+
+                    sourceId: String,
+                    sourceReference: String,
+
+                    tags: Option[Seq[String]] = None,
+
+                    comments: Option[Seq[Comment]] = None,
+                    links: Option[Seq[Link]] = None,
+                    activityHistory: Option[Seq[Activity]] = None) // is followup a property of the document?
+
+object Document {
+
+  def of(doc: DocumentRow,
+         owner: Option[UserRow] = None,
+         tags: Option[Seq[DtagRow]] = None,
+         comments: Option[Seq[Comment]] = None,
+         links: Option[Seq[Link]] = None,
+         activityHistory: Option[Seq[Activity]] = None) = Document(
+    id = doc.id,
+    name = doc.name,
+    description = doc.description,
+
+    owner = owner.map(User.of(_)),
+
+    tags = tags.map(_.map(_.name)),
+    comments = comments,
+    links = links,
+    activityHistory = activityHistory,
+
+    archiveTimestamp = doc.archivetimestamp.getTime,
+    modificationTimestamp = doc.modificationtimestamp.getTime,
+    followUpTimestamp = doc.followuptimestamp.map(_.getTime),
+
+    archivingComplete = doc.archivingcomplete,
+    actionRequired =  doc.actionrequired,
+
+    sourceId = doc.sourceid,
+    sourceReference = doc.sourcereference)
+
+  // implicit val formatDocument = Json.format[Document]
+  // implicit val readsDocument = Json.reads[Document]
+  implicit val writesDocument = Json.writes[Document]
+}
