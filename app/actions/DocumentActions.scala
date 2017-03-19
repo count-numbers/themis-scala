@@ -4,7 +4,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 import db._
-import models.{ActivityType, Document, Link, User}
+import models._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -15,6 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
                                      val activityRepository: ActivityRepository,
                                      val userRepository: UserRepository,
+                                     val contactRepository: ContactRepository,
                                      val linkRepository: LinkRepository,
                                      implicit val exec: ExecutionContext) {
 
@@ -65,6 +66,28 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
       _ => documentRepository.deleteTag(docId, tag).map((_, Unit)),
       ActivityType.Untagged, Seq(tag))
       .map(_.map(_._1))
+  }
+
+  def setContact(docId: Int, contactId: Int, username: String): Future[Option[Document]] = {
+    // first, see whether the contact even exists
+    for {
+      contactOpt: Option[Contact] <- contactRepository.getById(contactId)
+      docOpt <- contactOpt match {
+        case None => Future.successful(None)
+        case Some(contact: Contact) =>
+          withDocAndUser(docId, username,
+            _ => documentRepository.setContact(docId, Some(contactId)).map((_, Unit)),
+            ActivityType.SetContact, Seq(contact.name))
+            .map(_.map(_._1))
+      }
+    } yield docOpt
+  }
+
+  def clearContact(docId: Int, username: String): Future[Option[Document]] = {
+        withDocAndUser(docId, username,
+          _ => documentRepository.setContact(docId, None).map((_, Unit)),
+          ActivityType.SetContact, Seq())
+          .map(_.map(_._1))
   }
 
   def addLink(docId: Int, link: Link, username: String): Future[Option[Link]] = {

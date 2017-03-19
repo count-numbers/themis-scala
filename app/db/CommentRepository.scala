@@ -57,22 +57,5 @@ class CommentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider, 
       Some(models.Comment.of(commentRow, userRow))
     }
     dbConfig.db.run(insertAction)
-
-    /*
-    // see whether we find the document in the first place
-    val documentFound: Future[Boolean] = dbConfig.db.run(Tables.Document.filter(_.id === docId).exists.result)
-    documentFound.flatMap {
-      case false => Future(None)
-      case true =>
-        val insertAction = for {
-          userRows: Seq[Tables.UserRow]   <- Tables.User.filter(_.username === username).result
-          userRow: Tables.UserRow         <- DBIO.successful(userRows.headOption)
-          commentRow: Tables.CommentRow   <- Tables.Comment returning Tables.Comment += Tables.CommentRow(id = -1, docid = docId, text = text, userid = userRow.id, timestamp = new java.sql.Timestamp(System.currentTimeMillis()))
-        } yield {
-          Some(models.Comment.of(commentRow, userRow))
-        }
-        dbConfig.db.run(insertAction)
-    }
-    */
   }
 }

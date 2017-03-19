@@ -50,7 +50,7 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
              offset: Option[Int],
              limit: Option[Int]) = AuthAction().async {
     request => {
-      val resultFuture: Future[Seq[Document]] = documentRepository.search(q, fromArchiveTimestamp, toArchiveTimestamp, fromModificationTimestamp, toModificationTime, offset, limit)
+      val resultFuture: Future[Seq[Document]] = documentRepository.search(q, fromArchiveTimestamp, toArchiveTimestamp, fromModificationTimestamp, toModificationTime, offset.getOrElse(0), limit.getOrElse(10))
       for (result <- resultFuture)
         yield Ok(Json.toJson(result))
     }
@@ -134,6 +134,31 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
         docOpt
           .map((d: Document) => Ok(Json.toJson(d)))
           .getOrElse(NotFound(ErrorResponse(404, "Not found", s"No document with id ${id}.")))
+      }
+    }
+  }
+
+  def setContact(id: Int) = AuthAction().async(parse.text) {
+    implicit request => {
+      val contactId = request.body.toInt
+      for {
+        docOpt <- documentActions.setContact(docId = id, contactId = contactId, username = request.username)
+      } yield {
+        docOpt
+          .map((d: Document) => Ok(Json.toJson(d)))
+          .getOrElse(NotFound(ErrorResponse(404, "Not found", s"No document / contact with ids ${id} / ${contactId}.")))
+      }
+    }
+  }
+
+  def clearContact(id: Int) = AuthAction().async {
+    implicit request => {
+      for {
+        docOpt <- documentActions.clearContact(docId = id, username = request.username)
+      } yield {
+        docOpt
+          .map((d: Document) => Ok(Json.toJson(d)))
+          .getOrElse(NotFound(ErrorResponse(404, "Not found", s"No document with ids ${id}.")))
       }
     }
   }

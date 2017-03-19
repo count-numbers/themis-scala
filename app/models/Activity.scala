@@ -46,7 +46,7 @@ object ActivityType extends Enumeration {
   val Untagged = Value("UNTAGGED")
   val Renamed = Value("RENAMED")
   val Attached = Value("ATTACHED")
-  val SetContect = Value("SET_CONTACT")
+  val SetContact = Value("SET_CONTACT")
   val SetDescription = Value("SET_DESCRIPTION")
   val MarkedComplete = Value("MARKED_COMPLETE")
   val CreatedLink = Value("CREATED_LINK")

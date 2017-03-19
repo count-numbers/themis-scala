@@ -2,7 +2,7 @@ package models
 
 import java.time.LocalDateTime
 
-import db.Tables.{DocumentRow, DtagRow, UserRow}
+import db.Tables.{DocumentRow, ContactRow, DtagRow, UserRow}
 import play.api.libs.json.Json
 
 /**
@@ -13,6 +13,7 @@ case class Document(id: Int,
                     description: Option[String],
 
                     owner: Option[User],
+                    contact: Option[Contact],
 
                     archiveTimestamp: Long,
                     modificationTimestamp: Long,
@@ -34,6 +35,7 @@ object Document {
 
   def of(doc: DocumentRow,
          owner: Option[UserRow] = None,
+         contact: Option[ContactRow] = None,
          tags: Option[Seq[DtagRow]] = None,
          comments: Option[Seq[Comment]] = None,
          links: Option[Seq[Link]] = None,
@@ -43,6 +45,7 @@ object Document {
     description = doc.description,
 
     owner = owner.map(User.of(_)),
+    contact = contact.map(Contact.of(_)),
 
     tags = tags.map(_.map(_.name)),
     comments = comments,

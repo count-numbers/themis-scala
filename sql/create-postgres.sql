@@ -5,6 +5,7 @@ DROP TABLE link;
 DROP TABLE activity;
 DROP TABLE document;
 DROP TABLE "user";
+DROP TABLE contact;
 
 CREATE TABLE "user" (
    id SERIAL PRIMARY KEY,
@@ -14,13 +15,26 @@ CREATE TABLE "user" (
    password VARCHAR NOT NULL
 );
 
+CREATE TABLE contact (
+    id SERIAL PRIMARY KEY,
+    identifier VARCHAR NOT NULL UNIQUE,
+    name VARCHAR NOT NULL,
+    address1 VARCHAR,
+    address2 VARCHAR,
+    zip VARCHAR,
+    city VARCHAR,
+    region VARCHAR,
+    country VARCHAR,
+    email VARCHAR
+);
+
 CREATE TABLE document (
    id SERIAL PRIMARY KEY,
    name VARCHAR NOT NULL,
    description VARCHAR,
 
    owner INT REFERENCES "user"(id) NOT NULL,
-
+   contact INT REFERENCES contact(id),
    archiveTimestamp TIMESTAMP NOT NULL,
    modificationTimestamp TIMESTAMP NOT NULL,
    followUpTimestamp TIMESTAMP,
@@ -71,9 +85,12 @@ CREATE TABLE activity (
 INSERT INTO "user" (username, name, email, password) VALUES
     ('simon', 'Simon Fischer', 'count.numbers@web.de', 'password'); -- 1
 
-INSERT INTO document (name, description, owner, archiveTimestamp, modificationTimestamp, sourceId, sourceReference, archivingComplete, actionRequired) VALUES
-  ('Spotflix Prime Invoice', 'Invoice for your entertainment package', 1, '2017-01-15 08:00', '2017-01-16 14:30', 'demo', 'demo-1', FALSE, TRUE), -- 1
-  ('Homesafe', 'Send the funds and sleep well.', 1, '2017-02-07 09:00', '2017-02-21 19:00', 'demo', 'demo-2', FALSE, TRUE);                       -- 2
+INSERT INTO contact (identifier, name, address1, zip, city, region, country, email) VALUES
+    ('sender', 'The Sender', '5th Avenue', '12345', 'Vosshoefen', 'NRW', 'Germany', 'sender@example.com'); -- 1
+
+INSERT INTO document (name, description, owner, contact, archiveTimestamp, modificationTimestamp, sourceId, sourceReference, archivingComplete, actionRequired) VALUES
+  ('Spotflix Prime Invoice', 'Invoice for your entertainment package', 1, NULL, '2017-01-15 08:00', '2017-01-16 14:30', 'demo', 'demo-1', FALSE, TRUE), -- 1
+  ('Homesafe', 'Send the funds and sleep well.', 1, 1, '2017-02-07 09:00', '2017-02-21 19:00', 'demo', 'demo-2', FALSE, TRUE);                       -- 2
 
 INSERT INTO dtag (name) VALUES
     ('invoice'),        -- 1

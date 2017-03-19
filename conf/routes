@@ -21,6 +21,8 @@ PUT     /document/:id/archiving-complete        controllers.DocumentController.a
 PUT     /document/:id/action-required           controllers.DocumentController.actionRequired(id: Int)
 PUT     /document/:id/follow-up-timestamp       controllers.DocumentController.setFollowup(id: Int)
 DELETE  /document/:id/follow-up-timestamp       controllers.DocumentController.clearFollowup(id: Int)
+PUT     /document/:id/contact                   controllers.DocumentController.setContact(id: Int)
+DELETE  /document/:id/contact                   controllers.DocumentController.clearContact(id: Int)
 PUT     /document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.addTag(id: Int, tag: String)
 DELETE  /document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.deleteTag(id: Int, tag: String)
 POST    /document/:id/comments                  controllers.DocumentController.addComment(id: Int)
@@ -28,6 +30,13 @@ POST    /document/:id/links                     controllers.DocumentController.a
 GET     /documents/attention                    controllers.DocumentController.attention()
 GET     /documents/meta                         controllers.MetaController.documentsMeta()
 GET     /documents                              controllers.DocumentController.search(q: String, fromArchiveTimestamp: Option[Long], toArchiveTimestamp: Option[Long], fromModificationTimestamp: Option[Long], toModificationTime: Option[Long], offset: Option[Int], limit: Option[Int])
+
+# Contacts
+GET     /contact/:id/documents                 controllers.ContactController.getDocumentsForContact(id: Int, offset: Option[Int], limit: Option[Int])
+GET     /contact/:id                            controllers.ContactController.getById(id: Int)
+POST    /contact/:id                            controllers.ContactController.update(id: Int)
+POST    /contact                                controllers.ContactController.createNew()
+GET     /contacts                               controllers.ContactController.search(q: String, offset: Option[Int], limit: Option[Int])
 
 # Activities
 GET     /activities                 controllers.ActivitiesController.activities

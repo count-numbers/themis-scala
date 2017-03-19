@@ -41,14 +41,15 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
   def getById(id: Int): Future[Option[Document]] = {
 
     // 1. query docs, join with one user and many tags (via join table)
-    val docQuery: Query[(Tables.Document, Rep[Option[Tables.User]], Rep[Option[Dtag]]), (Tables.DocumentRow, Option[Tables.UserRow], Option[Tables.DtagRow]), Seq] = for {
-      (((doc, user), tagging), tag) <- (db.Tables.Document
+    val docQuery: Query[(Tables.Document, Rep[Option[Tables.User]], Rep[Option[Tables.Contact]], Rep[Option[Tables.Dtag]]), (Tables.DocumentRow, Option[Tables.UserRow], Option[Tables.ContactRow], Option[Tables.DtagRow]), Seq] = for {
+      ((((doc, user), contact), tagging), tag) <- (db.Tables.Document
                       joinLeft db.Tables.User on (_.owner === _.id)
-                      joinLeft db.Tables.Tagging on (_._1.id === _.docid)
+                      joinLeft db.Tables.Contact on (_._1.contact === _.id)
+                      joinLeft db.Tables.Tagging on (_._1._1.id === _.docid)
                       joinLeft db.Tables.Dtag on (_._2.map(_.tagid) === _.id)) if (doc.id === id)
-    } yield (doc, user, tag)
+    } yield (doc, user, contact, tag)
 
-    val docResultFuture: Future[Seq[(DocumentRow, Option[UserRow], Option[DtagRow])]] = dbConfig.db.run(docQuery.result)
+    val docResultFuture: Future[Seq[(DocumentRow, Option[UserRow], Option[ContactRow], Option[DtagRow])]] = dbConfig.db.run(docQuery.result)
 
     // 2. separately (to avoid an inefficient join on both tags and other entities), load comments and links
     val commentsFuture: Future[Seq[Comment]] = commentRepository.getForDocument(id)
@@ -56,7 +57,7 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
     val activitiesFuture = activityRepository.getForDocument(id)
 
     for {
-      docRows: Seq[(DocumentRow, Option[UserRow], Option[DtagRow])] <- docResultFuture
+      docRows: Seq[(DocumentRow, Option[UserRow], Option[ContactRow], Option[DtagRow])] <- docResultFuture
       comments: Seq[Comment]    <- commentsFuture
       links: Seq[Link]          <- linksFuture
       activities: Seq[Activity] <- activitiesFuture
@@ -64,21 +65,21 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
       // group by document and user (which is the same as grouping by document id - we do this only
       // so (doc,user) becomes the key and Seq[..., Tag] becomes the value
       // and then pick the first, if exists
-      val singleHit: Option[((DocumentRow, Option[UserRow]), Seq[(DocumentRow, Option[UserRow], Option[DtagRow])])] =
+      val singleHit: Option[((DocumentRow, Option[UserRow], Option[ContactRow]), Seq[(DocumentRow, Option[UserRow], Option[ContactRow], Option[DtagRow])])] =
         docRows
-          .groupBy(x => (x._1, x._2))
+          .groupBy(x => (x._1, x._2, x._3))
           .headOption
 
       singleHit.map({
         // split into Doc, Option[User] and Seq[..., ..., Tag]
-        case ((doc: DocumentRow, userOpt: Option[_root_.db.Tables.UserRow]), tagSeq: Seq[(DocumentRow, Option[UserRow], Option[DtagRow])])
+        case ((doc: DocumentRow, userOpt: Option[UserRow], contactOpt: Option[ContactRow]), tagSeq: Seq[(DocumentRow, Option[UserRow], Option[ContactRow], Option[DtagRow])])
         =>
         {
           val tags: Seq[DtagRow] = for {
             rowTriple    <- tagSeq
-            tag: DtagRow <- rowTriple._3 // take only 3rd element from triple (= tag)
+            tag: DtagRow <- rowTriple._4 // take only 3rd element from triple (= tag)
           } yield { tag }
-          Document.of(doc = doc, owner = userOpt, tags = Some(tags), comments = Some(comments), links = Some(links), activityHistory = Some(activities))
+          Document.of(doc = doc, owner = userOpt, contact = contactOpt, tags = Some(tags), comments = Some(comments), links = Some(links), activityHistory = Some(activities))
         }
       })
     }
@@ -133,24 +134,42 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
              toArchiveTimestamp: Option[Long],
              fromModificationTimestamp: Option[Long],
              toModificationTimestamp: Option[Long],
-             offset: Option[Int],
-             limit: Option[Int]): Future[Seq[Document]] = {
+             offset: Int,
+             limit: Int): Future[Seq[Document]] = {
     val searchExpression = "%" + searchTerm + "%"
-    val q = db.Tables.Document
-      .withFilter(d => (d.name like searchExpression) || (d.description like searchExpression))
-
     val query = for {
       (doc, user) <- db.Tables.Document joinLeft db.Tables.User on (_.owner === _.id)
                      if (doc.name like searchExpression) || (doc.description like searchExpression)
     } yield (doc, user)
 
-    val resultFuture: Future[Seq[(DocumentRow, Option[UserRow])]] = dbConfig.db.run(query.result)
+    val resultFuture: Future[Seq[(DocumentRow, Option[UserRow])]] = dbConfig.db.run(query.drop(offset).take(limit).result)
 
     for (result: Seq[(DocumentRow, Option[UserRow])] <- resultFuture)
       yield {
         for ((doc, user) <- result)
           yield Document.of(doc, user)
       }
+  }
+
+  def getDocumentsForContact(contactId: Int, offset: Int, limit: Int) = {
+    val query = for {
+      (doc, user) <- db.Tables.Document joinLeft db.Tables.User on (_.owner === _.id) if (doc.contact === contactId)
+    } yield (doc, user)
+
+    val resultFuture: Future[Seq[(DocumentRow, Option[UserRow])]] = dbConfig.db.run(query.drop(offset).take(limit).result)
+
+    for {
+      result: Seq[(DocumentRow, Option[UserRow])] <- resultFuture
+    } yield {
+      for {
+        (doc, user) <- result
+      } yield Document.of(doc, user)
+    }
+
+    dbConfig.db
+      .run(query.drop(offset).take(limit).result)
+      .map((rows: Seq[(DocumentRow, Option[UserRow])]) =>
+        rows.map{ case (doc: DocumentRow, userOpt: Option[UserRow]) => Document.of(doc, userOpt)})
   }
 
   /** Links a single tag to a document, creating the tag if needed. */
@@ -200,6 +219,12 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
   /** Updates the name of the document with the given ID. Returns false if it does not exist. */
   def setName(docId: Int, name: String): Future[Boolean] = {
     val updateAction = Tables.Document.filter(_.id === docId).map(_.name).update(name)
+    dbConfig.db.run(updateAction).map(_ == 1)
+  }
+
+  /** Updates the name of the document with the given ID. Returns false if it does not exist. */
+  def setContact(docId: Int, contactId: Option[Int]): Future[Boolean] = {
+    val updateAction = Tables.Document.filter(_.id === docId).map(_.contact).update(contactId)
     dbConfig.db.run(updateAction).map(_ == 1)
   }
 
