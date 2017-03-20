@@ -5,6 +5,7 @@ import javax.inject.{Inject, Singleton}
 
 import db.Tables._
 import db.Tables.profile.api._
+import models.Activity
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import slick.backend.DatabaseConfig
@@ -43,6 +44,24 @@ class ActivityRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
     }
 
     dbConfig.db.run(q)
+  }
+
+  def latest(offset: Int, limit: Int): Future[Seq[Activity]] = {
+    val q =
+      (Tables.Activity
+      joinLeft Tables.User on (_.userid === _.id)
+      joinLeft Tables.Document on (_._1.docid === _.id)
+      sortBy (_._1._1.timestamp.asc)  result)
+    val result: DBIOAction[Seq[Activity], NoStream, Read] = for {
+      rows: Seq[((ActivityRow, Option[UserRow]), Option[DocumentRow])] <- q
+    } yield {
+      for {
+        ((activity: ActivityRow, userOpt: Option[UserRow]), docOpt: Option[DocumentRow]) <- rows
+      } yield {
+        models.Activity.of(activity, userOpt.get, docOpt.get)
+      }
+    }
+    dbConfig.db.run(result)
   }
 
   /** Saves a new activity with the given parameters and links it to the given document and user.

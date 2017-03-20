@@ -11,7 +11,6 @@ POST    /login                      controllers.LoginController.login
 # Users
 GET     /user/me                    controllers.UserController.getMe()
 GET     /user/:username             controllers.UserController.getByUsername(username: String)
-# GET     /user/:username/password    controllers.UserController.changePassword(username: String)
 
 # Documents
 GET     /document/:id                           controllers.DocumentController.getById(id: Int)
@@ -32,14 +31,14 @@ GET     /documents/meta                         controllers.MetaController.docum
 GET     /documents                              controllers.DocumentController.search(q: String, fromArchiveTimestamp: Option[Long], toArchiveTimestamp: Option[Long], fromModificationTimestamp: Option[Long], toModificationTime: Option[Long], offset: Option[Int], limit: Option[Int])
 
 # Contacts
-GET     /contact/:id/documents                 controllers.ContactController.getDocumentsForContact(id: Int, offset: Option[Int], limit: Option[Int])
+GET     /contact/:id/documents                  controllers.ContactController.getDocumentsForContact(id: Int, offset: Option[Int], limit: Option[Int])
 GET     /contact/:id                            controllers.ContactController.getById(id: Int)
 POST    /contact/:id                            controllers.ContactController.update(id: Int)
 POST    /contact                                controllers.ContactController.createNew()
 GET     /contacts                               controllers.ContactController.search(q: String, offset: Option[Int], limit: Option[Int])
 
 # Activities
-GET     /activities                 controllers.ActivitiesController.activities
+GET     /activities                             controllers.ActivitiesController.latest
 
 # Tags
 GET     /tags                       controllers.TagController.search(q: String)
