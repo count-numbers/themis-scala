@@ -2,6 +2,7 @@ DROP TABLE tagging;
 DROP TABLE dtag;
 DROP TABLE comment;
 DROP TABLE link;
+DROP TABLE attachment;
 DROP TABLE activity;
 DROP TABLE document;
 DROP TABLE "user";
@@ -72,6 +73,14 @@ CREATE TABLE link (
     linkType VARCHAR NOT NULL
 );
 
+CREATE TABLE attachment (
+    id SERIAL PRIMARY KEY,
+    docId INT NOT NULL,
+    name VARCHAR NOT NULL,
+    size BIGINT NOT NULL,
+    mimeType VARCHAR NOT NULL
+);
+
 CREATE TABLE activity (
     id SERIAL PRIMARY KEY,
     docId INT REFERENCES document(id) NOT NULL,
@@ -115,4 +124,7 @@ INSERT INTO link (docId, title, url, linkType) VALUES
     (2, 'Trello Card', 'http://trello.com', 'TRELLO_CARD');
 
 INSERT INTO activity (docId, userId, activityType, arguments, timestamp) VALUES
-    (2, 1, 'CREATED', NULL, '2017-02-16 11:30')
+    (2, 1, 'CREATED', NULL, '2017-02-16 11:30');
+
+INSERT INTO attachment (docId, name, size, mimeType) VALUES
+    (2, 'scan-1234.pdf', 12000, 'application/pdf');

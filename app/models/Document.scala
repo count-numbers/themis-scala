@@ -27,6 +27,7 @@ case class Document(id: Int,
 
                     tags: Option[Seq[String]] = None,
 
+                    attachments: Option[Seq[Attachment]] = None,
                     comments: Option[Seq[Comment]] = None,
                     links: Option[Seq[Link]] = None,
                     activityHistory: Option[Seq[Activity]] = None) // is followup a property of the document?
@@ -37,6 +38,7 @@ object Document {
          owner: Option[UserRow] = None,
          contact: Option[ContactRow] = None,
          tags: Option[Seq[DtagRow]] = None,
+         attachments: Option[Seq[Attachment]] = None,
          comments: Option[Seq[Comment]] = None,
          links: Option[Seq[Link]] = None,
          activityHistory: Option[Seq[Activity]] = None) = Document(
@@ -49,6 +51,7 @@ object Document {
 
     tags = tags.map(_.map(_.name)),
     comments = comments,
+    attachments = attachments,
     links = links,
     activityHistory = activityHistory,
 

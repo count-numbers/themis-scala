@@ -51,7 +51,7 @@ class ActivityRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
       (Tables.Activity
       joinLeft Tables.User on (_.userid === _.id)
       joinLeft Tables.Document on (_._1.docid === _.id)
-      sortBy (_._1._1.timestamp.asc)  result)
+      sortBy (_._1._1.timestamp.desc)  result)
     val result: DBIOAction[Seq[Activity], NoStream, Read] = for {
       rows: Seq[((ActivityRow, Option[UserRow]), Option[DocumentRow])] <- q
     } yield {

@@ -14,6 +14,8 @@ libraryDependencies ++= Seq(
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
 )
 
+libraryDependencies += "org.swinglabs" % "pdf-renderer" % "1.0.5"
+
 val slickVersion = "3.1.1"
 libraryDependencies ++= List(
 

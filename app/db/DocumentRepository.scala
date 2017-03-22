@@ -7,7 +7,7 @@ import db.Tables.profile.api._
 import javax.inject.Inject
 import javax.inject.Singleton
 
-import models.{Activity, Comment, Document, Link}
+import models.{Activity, Attachment, Comment, Document, Link}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
@@ -31,6 +31,7 @@ object DocumentBaseMetaData {
 class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
                                    val commentRepository: CommentRepository,
                                    val linkRepository: LinkRepository,
+                                   val attachmentRepository: AttachmentRepository,
                                    val activityRepository: ActivityRepository,
                                    implicit val exec: ExecutionContext) {
 
@@ -53,14 +54,16 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
 
     // 2. separately (to avoid an inefficient join on both tags and other entities), load comments and links
     val commentsFuture: Future[Seq[Comment]] = commentRepository.getForDocument(id)
-    val linksFuture      = linkRepository.getForDocument(id)
-    val activitiesFuture = activityRepository.getForDocument(id)
+    val linksFuture       = linkRepository.getForDocument(id)
+    val activitiesFuture  = activityRepository.getForDocument(id)
+    val attachmentsFuture = attachmentRepository.getForDocument(id)
 
     for {
       docRows: Seq[(DocumentRow, Option[UserRow], Option[ContactRow], Option[DtagRow])] <- docResultFuture
-      comments: Seq[Comment]    <- commentsFuture
-      links: Seq[Link]          <- linksFuture
-      activities: Seq[Activity] <- activitiesFuture
+      comments: Seq[Comment]       <- commentsFuture
+      links: Seq[Link]             <- linksFuture
+      activities: Seq[Activity]    <- activitiesFuture
+      attachments: Seq[Attachment] <- attachmentsFuture
     } yield {
       // group by document and user (which is the same as grouping by document id - we do this only
       // so (doc,user) becomes the key and Seq[..., Tag] becomes the value
@@ -79,7 +82,7 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
             rowTriple    <- tagSeq
             tag: DtagRow <- rowTriple._4 // take only 3rd element from triple (= tag)
           } yield { tag }
-          Document.of(doc = doc, owner = userOpt, contact = contactOpt, tags = Some(tags), comments = Some(comments), links = Some(links), activityHistory = Some(activities))
+          Document.of(doc = doc, owner = userOpt, contact = contactOpt, tags = Some(tags), attachments = Some(attachments), comments = Some(comments), links = Some(links), activityHistory = Some(activities))
         }
       })
     }
