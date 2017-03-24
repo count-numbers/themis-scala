@@ -175,6 +175,31 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
         rows.map{ case (doc: DocumentRow, userOpt: Option[UserRow]) => Document.of(doc, userOpt)})
   }
 
+  def persist(name: String,
+              sourceId: String,
+              sourceReference: String,
+              ownerId: Int): Future[Int] = {
+    val now = new java.sql.Timestamp(System.currentTimeMillis());
+    val row = DocumentRow(
+      id = -1,
+      name = name,
+      description = None,
+
+      owner = ownerId,
+      contact = None,
+
+      sourceid = sourceId,
+      sourcereference = sourceReference,
+      archivingcomplete = false,
+      actionrequired = false,
+      archivetimestamp = now,
+      modificationtimestamp = now,
+      followuptimestamp = None)
+    val action = (Tables.Document returning Tables.Document.map(_.id)) += row
+    dbConfig.db.run(action)
+  }
+
+
   /** Links a single tag to a document, creating the tag if needed. */
   def addTag(docId: Int, tag: String): Future[Option[DtagRow]] = {
     Logger.debug(s"Adding tag ${tag}.")

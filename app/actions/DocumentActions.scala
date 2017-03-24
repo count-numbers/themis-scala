@@ -16,6 +16,7 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
                                      val activityRepository: ActivityRepository,
                                      val userRepository: UserRepository,
                                      val contactRepository: ContactRepository,
+                                     val attachmentRepository: AttachmentRepository,
                                      val linkRepository: LinkRepository,
                                      implicit val exec: ExecutionContext) {
 
@@ -97,6 +98,30 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
       .map(_.map(_._2))
   }
 
+  def addAttachment(docId: Int, name: String, size: Long, mimeType: String, username: String): Future[Option[Int]] = {
+    withDocAndUser(docId, username,
+      _ => attachmentRepository.persist(docId, name, size, mimeType).map((attachmentId: Int) => (true, attachmentId)),
+      ActivityType.Attached, Seq(name))
+      .map(_.map(_._2))
+  }
+
+  def createNew(name: String,
+                sourceId: String,
+                sourceReference: String,
+                ownerUsername: String): Future[Int] = {
+    for {
+      // first, find user
+      user: Option[User]            <- userRepository.getByUsername(ownerUsername)
+      // now, do the actual action
+      ((docId: Int, userId: Int))   <- user match {
+                                        case None => Future.failed(new Exception(s"User ${ownerUsername} not found."))
+                                        case Some(user) => documentRepository.persist(name, sourceId, sourceReference, user.id).map(docId => (docId, user.id))
+                                      }
+      success: Boolean              <- activityRepository.persist(docId = docId, userId = userId, timestamp = System.currentTimeMillis(), activityType = ActivityType.Created.toString, arguments = Seq(name))
+    } yield docId
+
+  }
+
   /** Runs a certain action with a document and user. Action will likely update
     * the document, and the updated document will be returned.
     * @param action the action once we know the user exits. Must return a boolean indicating success and a value
@@ -106,7 +131,7 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
                              activityType: ActivityType.ActivityType,
                              activityArguments: Seq[String]) : Future[Option[(Document, T)]] = {
     for {
-    // first, find user
+      // first, find user
       user: Option[User]      <- userRepository.getByUsername(username)
       // now, do the actual action
       (success: Boolean, result: T)  <- user match {

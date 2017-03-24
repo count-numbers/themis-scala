@@ -31,4 +31,10 @@ class AttachmentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvide
 
     dbConfig.db.run(q)
   }
+
+  def persist(docId: Int, name: String, size: Long, mimeType: String): Future[Int] = {
+    val row = AttachmentRow(id = -1, docid = docId, name = name, size = size, mimetype = mimeType)
+    val action = (Tables.Attachment returning Tables.Attachment.map(_.id)) += row
+    dbConfig.db.run(action)
+  }
 }
