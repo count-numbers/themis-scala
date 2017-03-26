@@ -12,10 +12,9 @@ import services.thumbnail.ThumbnailExtractor
 @Singleton
 class ContentExtractorService @Inject() (val cliRunner: CLIRunner) {
 
-  private val pdfOCRContentExtractor = new PdfOCRContentExtractor(cliRunner)
+  private val extractors = Seq(new OCRContentExtractor(cliRunner), new PlainTextContentExtractor)
 
   def forMimetype(mimeType: String): Option[ContentExtractor] = {
-    if (mimeType == "application/pdf") Some(pdfOCRContentExtractor) else None
+    extractors.find (_.getCompatibleMimeTypes.contains(mimeType))
   }
-
 }

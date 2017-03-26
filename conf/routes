@@ -30,6 +30,10 @@ GET     /documents/attention                    controllers.DocumentController.a
 GET     /documents/meta                         controllers.MetaController.documentsMeta()
 GET     /documents                              controllers.DocumentController.search(q: String, fromArchiveTimestamp: Option[Long], toArchiveTimestamp: Option[Long], fromModificationTimestamp: Option[Long], toModificationTime: Option[Long], offset: Option[Int], limit: Option[Int])
 
+# Attachments
+GET     /attachment/:id/body                    controllers.AttachmentController.download(id: Int)
+GET     /attachment/:id/thumbnail               controllers.AttachmentController.thumbnail(id: Int)
+
 # Contacts
 GET     /contact/:id/documents                  controllers.ContactController.getDocumentsForContact(id: Int, offset: Option[Int], limit: Option[Int])
 GET     /contact/:id                            controllers.ContactController.getById(id: Int)

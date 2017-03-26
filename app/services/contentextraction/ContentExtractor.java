@@ -9,6 +9,8 @@ import java.nio.file.Path;
  */
 public interface ContentExtractor {
 
+	public String[] getCompatibleMimeTypes();
+
 	/** Returns the content as plain text. */
 	public String extractContent(Path srcPath);
 }

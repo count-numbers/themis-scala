@@ -39,10 +39,13 @@ public class ImageThumbnailExtractor implements ThumbnailExtractor {
 		double scale = imgWidth / (double)srcImage.getWidth();
 
 		BufferedImage result = new BufferedImage((int)Math.round(imgWidth), (int)Math.round(imgHeight), BufferedImage.TYPE_INT_ARGB);
-		AffineTransform at = new AffineTransform();
-		at.scale(scale, scale);
-		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-		result = scaleOp.filter(srcImage, result);
+//		AffineTransform at = new AffineTransform();
+//		at.scale(scale, scale);
+//		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+
+		AffineTransform at = AffineTransform.getScaleInstance(scale, scale);
+		result.createGraphics().drawRenderedImage(srcImage, at);
+//		result = scaleOp.filter(srcImage, result);
 		
 		ImageIO.write(result, "png", thumbPath.toFile());
 	}

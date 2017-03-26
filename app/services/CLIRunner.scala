@@ -8,9 +8,9 @@ import java.lang.ProcessBuilder.Redirect
 import javax.inject.Inject
 import javax.inject.Singleton
 
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 
-import scala.sys.process.Process
+import scala.sys.process.{Process, ProcessBuilder}
 
 /**
   * Utilities to execute command line tools. Unfortunately, this is currently implemented in a blocking way.
@@ -29,7 +29,9 @@ class CLIRunner @Inject() (config: Configuration) {
 
   /** Starts the given command and reads the output as text. */
   def readStdoutAsText(command: Seq[String]): String = {
-    Process(command = command, cwd = workingDirectory) #>> devNull !!
+    Logger.info(s"Running command ${command}")
+    val stdout: String = (Process(command = command, cwd = workingDirectory)  !!)
+    return stdout
   }
 
   def runAndWait(command: Seq[String]): Boolean = {

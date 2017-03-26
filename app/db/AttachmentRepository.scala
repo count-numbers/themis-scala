@@ -21,6 +21,16 @@ class AttachmentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvide
 
   val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
+  def getById(id: Int): Future[Option[Attachment]] = {
+    val q = Tables.Attachment.filter(_.id === id).result
+    for {
+      rows: Seq[Tables.AttachmentRow] <- dbConfig.db.run(q)
+    } yield {
+      rows.headOption.map(models.Attachment.of)
+    }
+  }
+
+
   /** Returns all comments, linked to users, for the given document ID in ascending order of timestamp. */
   def getForDocument(docId: Int): Future[Seq[models.Attachment]] = {
     val q: DBIOAction[Seq[Attachment], NoStream, Read] = for {

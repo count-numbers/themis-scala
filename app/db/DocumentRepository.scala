@@ -176,6 +176,7 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
   }
 
   def persist(name: String,
+              description: Option[String],
               sourceId: String,
               sourceReference: String,
               ownerId: Int): Future[Int] = {
@@ -183,7 +184,7 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
     val row = DocumentRow(
       id = -1,
       name = name,
-      description = None,
+      description = description,
 
       owner = ownerId,
       contact = None,
