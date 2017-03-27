@@ -19,8 +19,6 @@ import play.api.libs.concurrent.AkkaGuiceSupport
 class Module extends AbstractModule with AkkaGuiceSupport {
 
   override def configure() = {
-
-
     bind(classOf[CLIRunner]).asEagerSingleton()
     bind(classOf[ContentExtractorService]).asEagerSingleton()
     bind(classOf[ThumbnailService]).asEagerSingleton()

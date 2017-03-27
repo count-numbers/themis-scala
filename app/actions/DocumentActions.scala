@@ -120,7 +120,6 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
                                       }
       success: Boolean              <- activityRepository.persist(docId = docId, userId = userId, timestamp = System.currentTimeMillis(), activityType = ActivityType.Created.toString, arguments = Seq(name))
     } yield docId
-
   }
 
   /** Runs a certain action with a document and user. Action will likely update

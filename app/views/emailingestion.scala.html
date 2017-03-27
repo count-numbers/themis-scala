@@ -1,0 +1,21 @@
+@(document: Document)
+
+@email("New document: @document.name") {
+
+<h1>@document.name</h1>
+<p>
+    A new document <strong>@document.name</strong> was created by source <em>@document.sourceId</em>.
+</p>
+<p>
+    <a href="#/document/@{document.id}">Complete archiving of this document.</a>
+</p>
+<h3>Preview</h3>
+<div>
+    @for(attachment <- document.attachments.getOrElse(Seq())) {
+    <span>
+        <img src="cid:att@{attachment.id}">
+        @attachment.name
+	</span>
+    }
+</div>
+}

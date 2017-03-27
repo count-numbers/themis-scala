@@ -26,14 +26,13 @@ libraryDependencies ++= List(
 
   "mysql" % "mysql-connector-java" % "6.0.5",
   "org.postgresql" % "postgresql" % "9.3-1100-jdbc4",
-  //  "postgresql" % "postgresql" % "9.3", //-1102.jdbc41",
-  //"postgresql" % "postgresql" % "9.4.1208-jdbc42-atlassian-hosted",
 
   "com.typesafe.play" %% "play-slick" % "2.0.0"
 )
 
 libraryDependencies ++= List(
-  "org.bitbucket.b_c" % "jose4j" % "0.4.4"
+  "org.bitbucket.b_c" % "jose4j" % "0.4.4",
+  "com.typesafe.play" %% "play-mailer" % "5.0.0"
 )
 
 

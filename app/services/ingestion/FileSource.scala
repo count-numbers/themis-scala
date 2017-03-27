@@ -7,7 +7,20 @@ import play.api.Logger
 import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+
+case class InsertionResult(documentIdFutures: Iterable[Future[Int]])(implicit val ec: ExecutionContext) {
+
+  def andThen(action: Int => Unit): InsertionResult = {
+    for {
+      docIdFuture: Future[Int] <- documentIdFutures
+      docId: Int <- docIdFuture
+    } {
+      action(docId)
+    }
+    this
+  }
+}
 
 /**
   * Created by simfischer on 3/24/17.
@@ -19,12 +32,12 @@ case class FileSource(sourceId: String, sourceDir: Path, destinationDir: Path, t
                       val executionContext: ExecutionContext) {
 
   /** Scans for new files and imports them. */
-  def scanForNewFiles() = {
+  def scanForNewFiles(): InsertionResult = {
     import scala.collection.JavaConverters._
 
-    for {
+    val insertionResults: Iterable[Future[Int]] = for {
       incomingFile: Path <- Files.newDirectoryStream(sourceDir).asScala
-    } {
+    } yield {
       val name = incomingFile.getName(incomingFile.getNameCount-1).toString
       // first move to temp folder. this way, we're not going to process it a second time in case of an
       // overlapping schedule
@@ -45,7 +58,7 @@ case class FileSource(sourceId: String, sourceDir: Path, destinationDir: Path, t
                                                 sourceId = sourceId,
                                                 sourceReference = file.toAbsolutePath.toString)
         attachmentId: Option[Int] <- documentActions.addAttachment(docId = docId, name = name, size = size, mimeType = mimeType, username = username)
-      } {
+      } yield {
         // if we are successful creating the document in the DB, move files around and extract thumbnail
         for (id <- attachmentId) {
           val dest = destinationDir.resolve(s"${id}.attachment")
@@ -55,7 +68,9 @@ case class FileSource(sourceId: String, sourceDir: Path, destinationDir: Path, t
             thumbnailExtractor.extractFromFile(dest, destinationDir.resolve(s"${id}.thumb"))
           }
         }
+        docId
       }
     }
+    InsertionResult(insertionResults)
   }
 }
