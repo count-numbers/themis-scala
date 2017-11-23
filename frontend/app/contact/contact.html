@@ -1,0 +1,85 @@
+<dms-loading loading="loading"></dms-loading>
+
+<div ng-show="contactComplete">
+	<h1>Contacts</h1>
+
+	<form role="form">
+		<div class="form-group">
+			<label for="identifier">Identifier (auto-filled):</label>
+			<div>
+				<input type="text" class="form-control" id="identifier" ng-model="contact.identifier" ng-keyup="identifierChanged()">
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="name">Name:</label>
+			<div>
+				<input type="text" class="form-control" id="name" ng-model="contact.name" ng-keyup="nameChanged()" autofocus="autofocus" >
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="address1">Street:</label>
+			<div>
+				<input type="text" class="form-control" id="address1" ng-model="contact.address1">
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="address2">Address line 2:</label>
+			<div>
+				<input type="text" class="form-control" id="address2" ng-model="contact.address2">
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="zip">Zip code and city:</label>
+			<div class="row">
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="zip" ng-model="contact.zip">
+				</div>
+				<div class="col-sm-8">
+					<input type="text" class="form-control" id="city" ng-model="contact.city">
+				</div>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="region">Region:</label>
+			<div>
+				<input type="text" class="form-control" id="region" ng-model="contact.region">
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="country">Country:</label>
+			<div>
+				<input type="text" class="form-control" id="country" ng-model="contact.country">
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="email">Email:</label>
+			<div>
+				<input type="email" class="form-control" id="email" ng-model="contact.email">
+			</div>
+		</div>
+
+		<button class="btn btn-primary" ng-click="saveContact()" ng-disabled="form.$invalid || savingContact">
+			{{contact.id ? 'Save' : 'Create'}}
+		</button>
+		<dms-loading-indicator loading="savingContact"></dms-loading-indicator>
+		
+	</form>
+
+
+</div>
+
+<dms-loading loading="loadingDocs"></dms-loading>
+<div class="skip-section" ng-show="linkedDocs">
+	<h2 class="skip-top-unrelated" >Linked documents</h2>
+	<p ng-hide="linkedDocs.length">
+		This contact has no linked documents.
+	</p>
+	<dms-document-list ng-show="linkedDocs.length" documents="linkedDocs"></dms-document-list>
+</div>

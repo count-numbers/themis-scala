@@ -1,0 +1,208 @@
+<dms-loading loading="loading"></dms-loading>
+
+<div ng-show="documentComplete">
+
+	<div>
+		<button ng-hide="document.actionRequired" popover-template="'document/document-action-required-popover.html'" popover-title="Mark as 'action required'" type="button" popover-placement="bottom" class="btn btn-default" popover-is-open="actionRequired.popoverOpen">Action required</button>
+		<button ng-hide="document.followUpTimestamp" class="btn btn-default" popover-template="'document/document-set-followup.html'" popover-title="Set follow-up" type="button" popover-placement="bottom" popover-is-open="followUp.popoverOpen">Set follow-up</button>
+		<button class="btn btn-default" data-toggle="modal" data-target="#trelloModal" ng-click="populateTrelloList()">Create Trello card</button>
+	</div>
+
+	<div class="page-header">
+		<h1>
+			<a href="#" editable-text="document.name"
+				onbeforesave="setName($data)">{{ document.name || "empty" }}</a>
+			<dms-loading-indicator loading="submittingName"></dms-loading-indicator>
+		</h1>
+	</div>
+
+	<div class="alert alert-warning" ng-hide="document.archivingComplete">
+		<p>
+			<span class="glyphicon glyphicon-question-sign"></span>
+			<strong>Archiving data incomplete!</strong>
+		</p>
+		<p>
+			When documents are ingested into the system by a document source, we make a best-guess approach to determine its properties. Usually,
+			fields like title, etc. need to be checked by a human, and tags need to be assigned, before archiving of the document can be considered
+			complete. Please do so, and then mark this document as complete, by pressing the button on the right.  
+		</p>
+		<button class="btn btn-default" ng-click="markComplete()" ng-disabled="submittingArchivingComplete">Mark as complete</button><dms-loading-indicator loading="submittingArchivingComplete"></dms-loading-indicator>
+	</div>
+	<div class="alert alert-info" ng-show="document.actionRequired">
+		<p>
+			<span class="glyphicon glyphicon-exclamation-sign"></span>
+			<strong>Action required!</strong>
+		</p>
+		<p>
+			This document is marked as <em>action required</em>. An action couple be responding or paying an invoice. Please read the comment feed to learn more about what is required for this particular document. After doing so, please click on &quot;Resolve&quot; below.
+			It is recommended to leave a comment before resolving. 
+		</p>
+		<button popover-template="'document/document-action-required-popover.html'" popover-title="Resolve" type="button" popover-placement="bottom" class="btn btn-default" popover-is-open="actionRequired.popoverResolveOpen">Resolve</button>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-8">
+			<h3>Description <dms-loading-indicator loading="submittingDescription"></dms-loading-indicator></h3>
+			<dms-editable-markup value="{{document.description}}" submit="submitDescription(value)"></dms-editable-markup>
+		</div>
+		<div class="col-sm-4 vr-left">
+			<h3>Contact</h3>
+			<div ng-hide="editingContact" >
+				<button class="btn btn-xs btn-default pull-right" ng-click="toggleContactEdit()">
+					<span class="glyphicon glyphicon-pencil"></span>
+				</button>
+				<dms-contact contact="document.contact"></dms-contact>
+			</div>
+
+			<div ng-hide="document.contact || editingContact">
+				<em>No contact linked to this document.</em>
+			</div>			
+			<div ng-show="editingContact">
+				<div class="row">
+					<div class="col-sm-11">
+						<select ng-show="editingContact" id="select-contact" placeholder="Select an existing contact"></select>
+					</div>
+					<div class="col-sm-1">
+						<button ng-hide="submittingContact" class="btn btn-default" ng-click="setContact()">Ok</button>
+						<dms-loading-indicator loading="submittingContact"></dms-loading-indicator>
+					</div>
+				</div>
+				<div>or <a href="#/contact/new?linkToDoc={{document.id}}">create a new one</a>, or <a ng-click="clearContact()">clear the contact for this document</a>.</div>
+				<button class="btn btn-default skip-top-unrelated" ng-click="toggleContactEdit()">Cancel</button>
+			</div>
+			
+			<h3>Dates</h3>
+			<table class="key-value-table">
+				<tbody>
+					<tr>
+						<td>Owner</td>
+						<td>{{document.owner.name}}</td>
+					</tr>
+					<tr>
+						<td>Archived</td>
+						<td>{{document.archiveTimestamp | date:'short'}}</td>
+					</tr>
+					<tr>
+						<td>Source</td>
+						<td>
+							<span ng-show="document.sourceId || document.sourceReference">
+								{{document.sourceId}} ({{document.sourceReference}})
+							</span>
+							<em ng-hide="document.sourceId || document.sourceReference">
+								unknown
+							</em>
+						</td>
+					</tr>
+					<tr>
+						<td>Modified</td>
+						<td>{{document.modificationTimestamp | date:'short'}}</td>
+					</tr>
+					<tr ng-show="document.followUpTimestamp">
+						<td>Follow-up</td>
+						<td>
+							{{document.followUpTimestamp | date:'short'}}
+							<a class="btn btn-xs" ng-click="followUp.clearFollowup()"><span class="glyphicon glyphicon-remove"></span></a>
+						</td>
+					</tr>
+
+				</tbody>
+			</table>
+
+			<h3>Tags</h3>
+			<div>
+				<tags-input ng-model="document.tags" display-property="name" key-property="name" on-tag-added="addDocumentTag($tag)" on-tag-removed="deleteDocumentTag($tag)"> <auto-complete
+					source="loadTags($query)"></auto-complete> </tags-input>
+			</div>
+			
+			<h3>Links
+				<a popover-template="'document/document-add-link-popover.html'" popover-title="Add link" type="button" popover-placement="bottom" class="btn btn-xs btn-default pull-right" popover-is-open="addLink.popoverOpen"><span class="glyphicon glyphicon-plus"></</span></a>
+			</h3>
+			<ul class="link-list">
+				<li ng-repeat="link in document.links">
+					<a ng-href="{{link.url}}" target="_blank">
+					<ng-switch on="link.type">
+						<ng-switch-when ng-switch-when="TRELLO_CARD">
+							<img ng-src="static/img/trello-mark-blue.png"/>&nbsp;
+						</ng-switch-when>
+						<ng-switch-when ng-switch-when="WEB_LINK">
+							<span class="glyphicon glyphicon-globe"></span>&nbsp;
+						</ng-switch-when>
+						<ng-switch-default ng-switch-default>
+							{{link.type}}:
+						</ng-switch-default>
+					</ng-switch>
+					{{link.title}}
+					</a>
+				</li>
+			</ul>			
+		</div>
+	</div>
+		
+	<hr clear="all" />
+	<h3>Files</h3>
+	<div class="row">
+		<div ng-repeat="attachment in document.attachments | orderBy : 'name'"
+			class="col-xs-6 col-md-3">
+			<div class="thumbnail">
+				<a
+					href="{{configuration.backendURL + 'rest/v1/attachment/' + attachment.id + '/body'}}">
+					<img
+					ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + attachment.id + '/thumbnail'}}"
+					alt="{{attachment.name}}">
+					<div class="caption">
+						<div>
+							<span class="glyphicon glyphicon-download"></span> <span
+								class="attachment-name"> {{attachment.name}} </span>
+							({{attachment.size}} bytes)
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<hr />
+	<h3>Comments and activity</h3>
+
+
+	<ul class="nav nav-tabs">
+		<li class="active"><a data-toggle="tab" data-target="#comments">Comments</a></li>
+		<li><a data-toggle="tab" data-target="#activity">Activity</a></li>
+	</ul>
+
+	<div class="tab-content">
+		<div id="comments" class="tab-pane fade in active">
+			<dms-comment-feed comments="document.comments" new-comment="newComment" onsubmit="submitComment()" submitting="submittingComment"></dms-comment-feed>
+		</div>
+		<div id="activity" class="tab-pane fade">
+			<dms-activity-feed feed="activityWithComments"></dms-activity-feed>
+		</div>
+	</div>
+</div>
+
+<!-- Trello Modal -->
+<div class="modal fade" id="trelloModal" tabindex="-1" role="dialog" aria-labelledby="trelloModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="trelloModalLabel">Create Trello card for {{document.name}}</h4>
+			</div>
+			<div class="modal-body">
+				<form>
+					<label for="select-trello-list">Add card to this list <dms-loading-indicator loading="loadingTrelloLists"></dms-loading-indicator></label>
+					<select id="select-trello-list" placeholder="Select a Trello list"></select>
+
+					<label for="trelloCardText" class="skip-top-unrelated">Card description</label>
+					<textarea ng-model="trelloCard.desc" class="form-control" id="trelloCardText" placeholder="Trello card description" rows="10"></textarea>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-primary" ng-disabled="submittingTrello || !trelloCard.idList" ng-click="createTrelloCard()">Create card<dms-loading-indicator loading="submittingTrello"></dms-loading-indicator></button>
+			</div>
+		</div>
+	</div>
+</div>

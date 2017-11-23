@@ -1,0 +1,35 @@
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				Markers
+			</th>
+			<th>
+				Document name
+			</th>
+			<th>
+				Owner
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="document in documents">
+			<td><span ng-show="document.actionRequired"
+				class="glyphicon glyphicon-exclamation-sign"></span> <span
+				ng-hode="document.archivingComplete"
+				class="glyphicon glyphicon-question-sign"></span>
+			</td>
+			<td>
+				<dms-document doc-id="document.id" name="document.name"></dms-document>
+				<div class="document-description">
+					{{document.description}}
+				</div>
+				<div>
+					<span ng-repeat="tag in document.tags" class="label label-default skip-right-related">{{tag.name}}</span>
+				</div>
+			</td>
+			<td><dms-user user-id="document.owner.id" name="document.owner.name"></dms-document>
+			</td>
+		</tr>
+	</tbody>
+</table>

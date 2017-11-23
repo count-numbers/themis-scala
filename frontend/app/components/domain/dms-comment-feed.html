@@ -1,0 +1,31 @@
+<div class="timeline skip-top-unrelated">
+	<div class="line text-muted"></div>
+	<div ng-repeat="comment in comments"
+		class="panel panel-default">
+		<div class="panel-heading icon">
+			<i class="glyphicon glyphicon-comment"></i>
+		</div>
+
+		<div class="panel-heading">
+			<dms-user user-id="comment.userId" name="comment.username"></dms-user>
+			commented
+			<time>{{comment.timestamp | date:'short'}}</time>
+		</div>
+		<div class="panel-body" ng-bind-html="comment.text | markdown"></div>
+	</div>
+
+	<div class="panel panel-default panel-outline">
+		<div class="panel-heading icon">
+			<i class="glyphicon glyphicon-plus"></i>
+		</div>
+		<div class="panel-body">
+			{{profile.name}}
+			<form>
+				<textarea rows="5" placeholder="Comment..." ng-model="newComment"></textarea>
+				<button type="button" class="btn btn-primary ng-disabled="submitting"
+					ng-click="submitting = true; onsubmit()">Post comment</button>
+				<dms-loading-indicator loading="submitting"></dms-loading-indicator>
+			</form>
+		</div>
+	</div>
+</div>

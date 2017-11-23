@@ -1,0 +1,10 @@
+<div ng-show="response" class="alert alert-danger" class="skip-bottom-unrelated skip-top-unrelated">
+	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  		<span aria-hidden="true">&times;</span>
+	</button>
+	<i class="glyphicon glyphicon-warning-sign"></i>
+	{{response.data.message}}
+	<span ng-hide="response.data.message">
+		Unknown error occurred.
+	</span>
+</div>

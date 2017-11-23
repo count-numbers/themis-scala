@@ -1,0 +1,16 @@
+/* documents list page */
+.table .document-description {
+	font-style: italic;
+	max-height: 50px;
+
+	display: -webkit-box;
+  	-webkit-line-clamp: 2;
+  	-webkit-box-orient: vertical;
+  
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.table .user {
+	white-space: nowrap;
+}

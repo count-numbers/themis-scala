@@ -1,0 +1,10 @@
+<div class="editable-markup" style="clear:all;">
+	<div ng-hide="editing" ng-click="toggle()" class="showing">
+		<article ng-bind-html="value|markdown"></article>
+		<em ng-hide	="value">Empty &ndash; click to edit.</em>
+	</div>
+	<div ng-show="editing">
+		<textarea rows="10" ng-model="editedValue" ng-blur="focusLost($event)"></textarea>
+		<button class="btn btn-default pull-right discard"><i class="glyphicon glyphicon-remove skip-right-related edit"></i>Discard</button>
+	</div>
+</div>

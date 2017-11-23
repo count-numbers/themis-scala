@@ -1,0 +1,59 @@
+<div class="page-header">
+	<h1>My Profile</h1>
+</div>
+<table class="key-value-table">
+	<tbody>
+		<tr>
+			<td>Username</td>
+			<td>{{profile.username}}</td>
+		</tr>
+		<tr>
+			<td>Name</td>
+			<td>{{profile.name}}</td>
+		</tr>
+		<tr>
+			<td>Email</td>
+			<td>{{profile.email}}</td>
+		</tr>
+		<tr>
+			<td>Password</td>
+			<td><button class="btn btn-default" data-toggle="modal" data-target="#passwordModal">Change</button></td>
+		</tr>
+	</tbody>
+</table>
+
+
+<!-- Modal -->
+<div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="passwordModalLabel">Change password for {{profile.username}}</h4>
+			</div>
+			<div class="modal-body">
+				<dms-rest-error response="passwordError"></dms-rest-error>
+				<form>
+					<div>
+						<input type="password" class="form-control" placeholder="Old password" ng-model="oldPassword"/>
+					</div>
+					<div class="skip-top-unrelated">
+						<input type="password" class="form-control" placeholder="New password" ng-model="newPassword"/>
+					</div>
+					<div class="skip-top-related">
+						<input type="password" class="form-control" placeholder="Repeat new password" ng-model="newPasswordRepeat" />
+					</div>
+					<div ng-hide="passwordsMatch()" class="alert alert-danger skip-top-related" >
+						Passwords do not match
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" ng-disabled="!canSubmit()" ng-click="changePassword()">Change password</button>
+			</div>
+		</div>
+	</div>
+</div>

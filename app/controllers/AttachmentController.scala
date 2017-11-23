@@ -6,14 +6,14 @@ import javax.inject.{Inject, Singleton}
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
 import auth.AuthAction
-import db.{AttachmentRepository}
-import models.{Attachment}
-import play.api.Configuration
+import db.AttachmentRepository
+import models.Attachment
+import play.api.{Configuration, Logger}
 import play.api.http.HttpEntity
 import play.api.mvc.{Controller, ResponseHeader, Result}
 import util.{ErrorResponse, FileSystemUtils}
 
-import scala.concurrent.{ExecutionContext}
+import scala.concurrent.ExecutionContext
 
 /**
   * Created by simfischer on 3/12/17.
@@ -32,6 +32,7 @@ class AttachmentController @Inject()(attachmentRepository: AttachmentRepository,
           case Some(attachment: Attachment) => {
             val pathOpt = FileSystemUtils.attachmentPath(attachment.id)
             pathOpt.map(path => {
+              Logger.debug(s"Streaming ${path}.")
               val source: Source[ByteString, _] = FileIO.fromPath(path)
               Result(
                 header = ResponseHeader(200, Map.empty),
@@ -57,6 +58,7 @@ class AttachmentController @Inject()(attachmentRepository: AttachmentRepository,
             pathOpt.map((path: Path) => {
               val source: Source[ByteString, _] = FileIO.fromPath(path)
               if (Files.exists(path)) {
+                Logger.debug(s"Streaming ${path}.")
                 Result(
                   header = ResponseHeader(200, Map.empty),
                   body = HttpEntity.Streamed(source, Some(Files.size(path)), Some("image/png"))

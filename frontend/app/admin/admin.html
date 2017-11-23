@@ -1,0 +1,26 @@
+<h1>Configuration</h1>
+<pre class="editable" ng-click="edit()" ng-hide="editing">
+{{serverConfig | json}}
+</pre>
+<form role="form" ng-show="editing">
+	<div class="form-group">
+		<label for="serversettings">Server configuration:</label>
+		<textarea id="serversettings" class="form-control" rows="15" ng-model="serverConfigJson"></textarea>
+	</div>
+
+	<button class="btn btn-primary" ng-click="submit()" role="submit" ng-disabled="submitting">Submit</button>
+	<dms-loading-indicator loading="submitting"></dms-loading-indicator>
+	<a class="skip-left-related" ng-click="cancelEdit()">Cancel</a>
+</form>
+
+
+<div class="skip-top-unrelated">
+<a role="button" data-toggle="collapse" data-target="#sample-config" aria-expanded="false" aria-controls="collapseExample">
+  Show me a sample
+</a>
+<div class="collapse" id="sample-config">
+<h3>Sample</h3>
+<pre ng-include="'admin/sample-config.js'">
+</pre>
+</div>
+

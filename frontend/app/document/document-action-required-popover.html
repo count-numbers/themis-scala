@@ -1,0 +1,17 @@
+<div>
+	<form role="form">
+
+		<div class="form-group">
+			<label for="action-required-comment">Leave a comment (optional)</label>
+			<textarea id="action-required-comment" class="form-control" ng-model="actionRequired.comment"></textarea>
+		</div>
+
+		<div class="form-group">
+			<button class="btn btn-primary" ng-click="actionRequired.submit()">
+				<span ng-show="!document.actionRequired">Action required</span>
+				<span ng-show="document.actionRequired">Resolve</span>
+				<dms-loading-indicator loading="actionRequired.submitting">
+			</dms-loading-indicator></button>
+		</div>
+	</form>
+</div>

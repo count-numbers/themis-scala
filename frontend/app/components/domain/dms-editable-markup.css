@@ -1,0 +1,8 @@
+/* editable markup */
+.editable, .editable-markup .showing {
+	cursor: pointer;	
+}
+
+.editable-markup textarea {
+	width:100%;
+}

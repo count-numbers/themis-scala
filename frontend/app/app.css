@@ -1,0 +1,87 @@
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+/* So <a> without annoying href="#" look like they do something. */
+a[ng-click]{
+    cursor: pointer;
+}
+
+
+/* Fix fixed navbar */
+body { 
+	padding-top: 70px; 
+	font-family: 'Roboto', sans-serif;
+}
+
+/* key-value table  */
+.key-value-table tbody tr td:FIRST-CHILD {
+	color: #888;
+	padding-right: 2ex;
+	vertical-align: middle;
+}
+
+.key-value-table tbody tr td:FIRST-CHILD:AFTER {
+	content: ":";
+}
+
+.key-value-table tbody tr td {
+	padding-top: 0.5ex;
+	padding-bottom: 0.5ex;
+	vertical-align: top;	
+}	
+
+/* Spacing */
+.skip-right-related {
+	margin-right:1ex;	
+}
+.skip-right-related {
+	margin-right:2ex;	
+}
+.skip-left-related {
+	margin-left:1ex;	
+}
+.skip-left-related {
+	margin-left:2ex;	
+}
+.skip-top-unrelated {
+	margin-top:2ex;
+}
+.skip-top-related {
+	margin-top:1ex;
+}
+.skip-bottom-unrelated {
+	margin-bottom:2ex;
+}
+.skip-bottom-related {
+	margin-bottom:1ex;
+}
+
+.skip-section {
+	margin-top:7ex;
+}
+
+.pull-up {
+	margin-top:0;
+}
+
+/* ajax indicator */
+.ajax-indicator {
+	margin-left: auto;
+	margin-right: auto;
+	width:100px;	
+}
+
+/* Slider */
+.slider-selection {
+	background: #BABABA;
+}
+
+.vr-left {
+	border-left: 1px solid #eee;
+}
+
+.editable-click, a.editable-click {
+	border: none;
+	color: rgb(51,51,51);
+}

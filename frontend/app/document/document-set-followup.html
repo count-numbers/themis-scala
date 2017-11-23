@@ -1,0 +1,36 @@
+<div>
+	<form role="form">
+
+		<div class="form-group">
+			<label for="followup-date">Follow up on</label>
+			<p class="input-group">
+				<input id="followup-date" type="text" class="form-control" datepicker-popup="dd.MM.yyyy" ng-model="followUp.date" min-date="followUp.minDate" is-open="followUp.datePickerOpen" ng-required="true" close-text="Close" />
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-default" ng-click="followUp.openDatePicker($event)">
+						<i class="glyphicon glyphicon-calendar"></i>
+					</button>
+				</span>
+			</p>
+			<div class="btn-group" role="group">
+				<button class="btn btn-sm btn-default" ng-click="followUp.tomorrow()">Tomorrow</button>
+				<button class="btn btn-sm btn-default" ng-click="followUp.nextWeek()">Next week</button>
+				<button class="btn btn-sm btn-default" ng-click="followUp.inFourWeeks()">Four weeks</button>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="followup-comment">Leave a comment (optional)</label>
+			<textarea id="followup-comment" class="form-control" ng-model="followUp.comment"></textarea>
+		</div>
+
+		<div class="form-group">
+			<button class="btn btn-primary" ng-click="followUp.submit()">
+				Set follow-up
+				<dms-loading-indicator loading="followUp.submitting">
+			</dms-loading-indicator></button>
+		</div>
+
+
+
+	</form>
+</div>

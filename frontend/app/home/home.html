@@ -1,0 +1,10 @@
+<h1>Documents Requiring Attention</h1>
+<div class="alert alert-info">
+This page does not use pagination yet!
+</div>
+<dms-loading loading="loadingDocuments"></dms-loading>
+<dms-document-list ng-show="!loadingDocuments" documents="documents"></dms-document-list>
+
+<h1>Activity Feed</h1>
+<dms-loading loading="loadingActivityFeed"></dms-loading>
+<dms-activity-feed ng-show="!loadingActivityFeed" feed="activityStream"></dms-activity-feed>
