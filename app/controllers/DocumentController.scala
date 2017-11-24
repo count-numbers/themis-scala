@@ -56,6 +56,16 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
     }
   }
 
+  def attention(offset: Option[Int],
+                limit: Option[Int]) = AuthAction().async {
+    request => {
+      val resultFuture: Future[Seq[Document]] = documentRepository.attentionRequired(offset.getOrElse(0), limit.getOrElse(10))
+      for (result <- resultFuture)
+        yield Ok(Json.toJson(result))
+    }
+  }
+
+
   /** Returns 404 if document does not exist.
     * @see DocumentRepository#addTag*/
   def addTag(id: Int, tag: String) = AuthAction().async {
@@ -217,10 +227,6 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
           .getOrElse(NotFound(ErrorResponse(404, "Not found", s"No document with id ${id}.")))
       }
     }
-  }
-
-  def attention() = Action {
-    request => Ok("[]")
   }
 
   /** Private helper to create Location headers for 201 CREATED responses. */

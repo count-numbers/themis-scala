@@ -26,7 +26,7 @@ PUT     /document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.a
 DELETE  /document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.deleteTag(id: Int, tag: String)
 POST    /document/:id/comments                  controllers.DocumentController.addComment(id: Int)
 POST    /document/:id/links                     controllers.DocumentController.addLink(id: Int)
-GET     /documents/attention                    controllers.DocumentController.attention()
+GET     /documents/attention                    controllers.DocumentController.attention(offset: Option[Int], limit: Option[Int])
 GET     /documents/meta                         controllers.MetaController.documentsMeta()
 GET     /documents                              controllers.DocumentController.search(q: String, fromArchiveTimestamp: Option[Long], toArchiveTimestamp: Option[Long], fromModificationTimestamp: Option[Long], toModificationTime: Option[Long], offset: Option[Int], limit: Option[Int])
 

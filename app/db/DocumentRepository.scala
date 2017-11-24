@@ -154,6 +154,36 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
       }
   }
 
+  def attentionRequired(offset: Int, limit: Int): Future[Seq[Document]] = {
+    val query: Query[(Tables.Document, Rep[Option[Tables.User]], Rep[Option[Dtag]]), (Tables.DocumentRow, Option[Tables.UserRow], Option[Tables.DtagRow]), Seq] = for {
+      (((doc, user), tagging), tag) <- (db.Tables.Document
+        joinLeft db.Tables.User on (_.owner === _.id)
+        joinLeft db.Tables.Tagging on (_._1.id === _.docid)
+        joinLeft db.Tables.Dtag on (_._2.map(_.tagid) === _.id)) if (!doc.archivingcomplete || doc.actionrequired)
+    } yield (doc, user, tag)
+
+    val resultFuture: Future[Seq[(DocumentRow, Option[UserRow], Option[DtagRow])]] = dbConfig.db.run(query.drop(offset).take(limit).result)
+
+    for {
+      allRows: Seq[(DocumentRow, Option[Tables.UserRow], Option[DtagRow])] <- resultFuture
+    } yield {
+      val groupedByDocRows: Map[(DocumentRow, Option[UserRow]), Seq[(DocumentRow, Option[UserRow], Option[DtagRow])]] =
+        allRows
+          .groupBy(x => (x._1, x._2))
+
+      val documentIterator = for {
+        ((doc: DocumentRow, userOpt : Option[UserRow]), tagSeq: Seq[(_, _, Option[DtagRow])]) <- groupedByDocRows
+      } yield {
+        val tags: Seq[DtagRow] = for {
+          rowTriple    <- tagSeq
+          tag: DtagRow <- rowTriple._3 // take only 3rd element from triple (= tag)
+        } yield { tag }
+        Document.of(doc = doc, owner = userOpt, tags = Some(tags))
+      }
+      documentIterator.toSeq
+    }
+  }
+
   def getDocumentsForContact(contactId: Int, offset: Int, limit: Int) = {
     val query = for {
       (doc, user) <- db.Tables.Document joinLeft db.Tables.User on (_.owner === _.id) if (doc.contact === contactId)
