@@ -34,7 +34,7 @@
 			<strong>Action required!</strong>
 		</p>
 		<p>
-			This document is marked as <em>action required</em>. An action couple be responding or paying an invoice. Please read the comment feed to learn more about what is required for this particular document. After doing so, please click on &quot;Resolve&quot; below.
+			This document is marked as <em>action required</em>. An action could be sending a response or paying an invoice. Please read the comment feed to learn more about what is required for this particular document. After doing so, please click on &quot;Resolve&quot; below.
 			It is recommended to leave a comment before resolving. 
 		</p>
 		<button popover-template="'document/document-action-required-popover.html'" popover-title="Resolve" type="button" popover-placement="bottom" class="btn btn-default" popover-is-open="actionRequired.popoverResolveOpen">Resolve</button>
@@ -67,7 +67,7 @@
 						<dms-loading-indicator loading="submittingContact"></dms-loading-indicator>
 					</div>
 				</div>
-				<div>or <a href="#/contact/new?linkToDoc={{document.id}}">create a new one</a>, or <a ng-click="clearContact()">clear the contact for this document</a>.</div>
+				<div>or <a href="#/contact/new?linkToDoc={{document.id}}&linkToName={{document.name}}">create a new one</a>, or <a ng-click="clearContact()">clear the contact for this document</a>.</div>
 				<button class="btn btn-default skip-top-unrelated" ng-click="toggleContactEdit()">Cancel</button>
 			</div>
 			

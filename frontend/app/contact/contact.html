@@ -66,7 +66,7 @@
 		</div>
 
 		<button class="btn btn-primary" ng-click="saveContact()" ng-disabled="form.$invalid || savingContact">
-			{{contact.id ? 'Save' : 'Create'}}
+			{{contact.id ? 'Save' : (isLinkingToDocument() ? 'Crete and link to '+targetDocumentName() : 'Create')}}
 		</button>
 		<dms-loading-indicator loading="savingContact"></dms-loading-indicator>
 		

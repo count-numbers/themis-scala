@@ -9,10 +9,16 @@ angular.module('dms.contact', ['ngRoute'])
   });
 }])
 
-.controller('ContactCtrl', function($scope, $routeParams, Contact, Errors) {
+.controller('ContactCtrl', function($scope, $routeParams, $location, Contact, Document, Errors) {
 	$scope.nameToIdentifier = function(name) {
 		return name.toLowerCase().replace(/[^a-z0-9]/ig, '-');
 	}
+    $scope.isLinkingToDocument = function() {
+        return ($routeParams.linkToDoc);
+    }
+    $scope.targetDocumentName = function() {
+        return ($routeParams.linkToName);
+    }
 
 	$scope.loading = true;
 	$scope.contactComplete = false;
@@ -68,9 +74,25 @@ angular.module('dms.contact', ['ngRoute'])
 	
 	$scope.saveContact = function() {
 		$scope.savingContact = true;
-		$scope.contact.$save(function() {
-			$scope.savingContact = false;
-			$.bootstrapGrowl("Contact saved!", { ele: 'body', type: 'info' });
+		$scope.contact.$save(function(savedContact) {
+		    console.log("Saved contact");
+		    $scope.contact = savedContact;
+			if ($routeParams.linkToDoc) {
+    			console.log("Linking new contact to document "+$routeParams.linkToDoc);
+                Document.setContact({docId:$routeParams.linkToDoc}, $scope.contact.id,
+                                function(result) {
+                                    $scope.savingContact = false;
+                                    $.bootstrapGrowl("Contact saved and linked to document!", { ele: 'body', type: 'info' });
+                                    $location.path("/document/"+$routeParams.linkToDoc)
+                                },
+                                function(response) {
+                                    $scope.savingContact = false;
+                                    Errors.add(response);
+                                });
+            } else {
+                $scope.savingContact = false;
+                $.bootstrapGrowl("Contact saved!", { ele: 'body', type: 'info' });
+            }
 		}, function(error) {
 			$scope.savingContact = false;
 			console.log(error);
