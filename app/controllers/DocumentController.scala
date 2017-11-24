@@ -50,7 +50,7 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
              offset: Option[Int],
              limit: Option[Int]) = AuthAction().async {
     request => {
-      val resultFuture: Future[Seq[Document]] = documentRepository.search(q, fromArchiveTimestamp, toArchiveTimestamp, fromModificationTimestamp, toModificationTime, offset.getOrElse(0), limit.getOrElse(10))
+      val resultFuture: Future[Seq[Document]] = documentRepository.searchWithTags(q, fromArchiveTimestamp, toArchiveTimestamp, fromModificationTimestamp, toModificationTime, offset.getOrElse(0), limit.getOrElse(10))
       for (result <- resultFuture)
         yield Ok(Json.toJson(result))
     }

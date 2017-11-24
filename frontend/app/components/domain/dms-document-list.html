@@ -16,7 +16,7 @@
 		<tr ng-repeat="document in documents">
 			<td><span ng-show="document.actionRequired"
 				class="glyphicon glyphicon-exclamation-sign"></span> <span
-				ng-hode="document.archivingComplete"
+				ng-hide="document.archivingComplete"
 				class="glyphicon glyphicon-question-sign"></span>
 			</td>
 			<td>
@@ -25,7 +25,7 @@
 					{{document.description}}
 				</div>
 				<div>
-					<span ng-repeat="tag in document.tags" class="label label-default skip-right-related">{{tag.name}}</span>
+					<span ng-repeat="tag in document.tags" class="label label-default skip-right-related">{{tag}}</span>
 				</div>
 			</td>
 			<td><dms-user user-id="document.owner.id" name="document.owner.name"></dms-document>

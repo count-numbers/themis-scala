@@ -95,8 +95,8 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
                 toArchiveTimestamp: Option[Long],
                 fromModificationTimestamp: Option[Long],
                 toModificationTimestamp: Option[Long],
-                offset: Option[Int],
-                limit: Option[Int]): Future[Seq[Document]] = {
+                offset: Int,
+                limit: Int): Future[Seq[Document]] = {
 
     val searchExpression = "%" + searchTerm + "%"
 
@@ -107,7 +107,7 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
         joinLeft db.Tables.Dtag on (_._2.map(_.tagid) === _.id)) if (doc.name like searchExpression) || (doc.description like searchExpression)
     } yield (doc, user, tag)
 
-    val resultFuture: Future[Seq[(DocumentRow, Option[UserRow], Option[DtagRow])]] = dbConfig.db.run(query.result)
+    val resultFuture: Future[Seq[(DocumentRow, Option[UserRow], Option[DtagRow])]] = dbConfig.db.run(query.drop(offset).take(limit).result)
 
     for {
       allRows: Seq[(DocumentRow, Option[Tables.UserRow], Option[DtagRow])] <- resultFuture
