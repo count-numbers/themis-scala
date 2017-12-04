@@ -42,7 +42,7 @@ case class FileSource(sourceId: String, sourceDir: Path, destinationDir: Path, t
       // first move to temp folder. this way, we're not going to process it a second time in case of an
       // overlapping schedule
       val file: Path = Files.move(incomingFile, tempDir.resolve(name))
-      Logger.info(s"Moving incoming ${incomingFile} to ${file}")
+      Logger.info(s"Moving incoming ${incomingFile} to ${file}.")
 
       val size = Files.size(file)
       val mimeType = Files.probeContentType(file)
@@ -51,6 +51,7 @@ case class FileSource(sourceId: String, sourceDir: Path, destinationDir: Path, t
       } yield {
         contentExtractor.extractContent(file)
       }
+      Logger.debug(s"Extracted ${description.map(_.length)} bytes of content.")
       for {
         docId: Int <- documentActions.createNew(name = name,
                                                 description = description,
@@ -59,6 +60,7 @@ case class FileSource(sourceId: String, sourceDir: Path, destinationDir: Path, t
                                                 sourceReference = file.toAbsolutePath.toString)
         attachmentId: Option[Int] <- documentActions.addAttachment(docId = docId, name = name, size = size, mimeType = mimeType, username = username)
       } yield {
+        Logger.debug(s"Assigned new document ID ${docId}.")
         // if we are successful creating the document in the DB, move files around and extract thumbnail
         for (id <- attachmentId) {
           val dest = destinationDir.resolve(s"${id}.attachment")

@@ -2,7 +2,7 @@ package db
 
 import java.sql.Timestamp
 
-import db.Tables._
+import db.Tables.{profile, _}
 import db.Tables.profile.api._
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,6 +15,7 @@ import slick.backend.DatabaseConfig
 import slick.dbio.DBIOAction
 import slick.dbio.Effect.{Read, Write}
 import slick.driver.JdbcProfile
+import slick.lifted.{QueryBase, SimpleExpression}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -100,11 +101,19 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
 
     val searchExpression = "%" + searchTerm + "%"
 
+    val fulltextMatch = SimpleExpression.binary[Option[String],String,Boolean] { (col,search,qb) =>
+      //qb.sqlBuilder += "match("
+      qb.expr(col)
+      qb.sqlBuilder += " @@ to_tsquery('pg_catalog.english', "
+      qb.expr(search)
+      qb.sqlBuilder += ")"
+    }
+
     val query: Query[(Tables.Document, Rep[Option[Tables.User]], Rep[Option[Dtag]]), (Tables.DocumentRow, Option[Tables.UserRow], Option[Tables.DtagRow]), Seq] = for {
       (((doc, user), tagging), tag) <- (db.Tables.Document
         joinLeft db.Tables.User on (_.owner === _.id)
         joinLeft db.Tables.Tagging on (_._1.id === _.docid)
-        joinLeft db.Tables.Dtag on (_._2.map(_.tagid) === _.id)) if (doc.name like searchExpression) || (doc.description like searchExpression)
+        joinLeft db.Tables.Dtag on (_._2.map(_.tagid) === _.id)) if fulltextMatch(doc.fulltext, searchTerm)
     } yield (doc, user, tag)
 
     val resultFuture: Future[Seq[(DocumentRow, Option[UserRow], Option[DtagRow])]] = dbConfig.db.run(query.drop(offset).take(limit).result)
@@ -211,23 +220,16 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
               sourceReference: String,
               ownerId: Int): Future[Int] = {
     val now = new java.sql.Timestamp(System.currentTimeMillis());
-    val row = DocumentRow(
-      id = -1,
-      name = name,
-      description = description,
+    // we're projecting to only the columns we want to insert because we must avoid inserting fulltext - it would
+    // cause an SQL type error since Strings do not match to Postgres tsvectors. fulltext is populated
+    // via a DB trigger
+    val action = (Tables.Document.map(dr => (dr.name, dr.description, dr.sourceid, dr.sourcereference, dr.owner, dr.archivingcomplete, dr.actionrequired, dr.archivetimestamp, dr.modificationtimestamp))
+      returning Tables.Document.map(_.id)) += (name, description, sourceId, sourceReference, ownerId, false, false, now, now)
 
-      owner = ownerId,
-      contact = None,
-
-      sourceid = sourceId,
-      sourcereference = sourceReference,
-      archivingcomplete = false,
-      actionrequired = false,
-      archivetimestamp = now,
-      modificationtimestamp = now,
-      followuptimestamp = None)
-    val action = (Tables.Document returning Tables.Document.map(_.id)) += row
-    dbConfig.db.run(action)
+    val f: Future[Int] = dbConfig.db.run(action)
+    f.onSuccess({ case id: Int => Logger.info(s"Inserted document with id ${id}")})
+    f.onFailure({ case ex: Throwable => Logger.warn(s"Failed to insert document: ${ex}!", ex)})
+    return f;
   }
 
 

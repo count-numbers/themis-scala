@@ -32,7 +32,7 @@ CREATE TABLE contact (
 CREATE TABLE document (
    id SERIAL PRIMARY KEY,
    name VARCHAR NOT NULL,
-   description VARCHAR,
+   description TEXT,
 
    owner INT REFERENCES "user"(id) NOT NULL,
    contact INT REFERENCES contact(id),
@@ -44,7 +44,9 @@ CREATE TABLE document (
    sourceReference VARCHAR NOT NULL,
 
    archivingComplete BOOLEAN NOT NULL,
-   actionRequired BOOLEAN NOT NULL
+   actionRequired BOOLEAN NOT NULL,
+
+   fulltext TSVECTOR
 );
 
 CREATE TABLE dtag (
@@ -91,8 +93,18 @@ CREATE TABLE activity (
 );
 
 
+-- Fulltext setup. Create trigger to concatenate name and description into fulltext column and create index
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
+ON document FOR EACH ROW EXECUTE PROCEDURE
+tsvector_update_trigger(fulltext, 'pg_catalog.english', name, description);
+
+CREATE INDEX textsearch_idx ON document USING GIN (fulltext);
+
+
+
+
 INSERT INTO "user" (username, name, email, password) VALUES
-    ('simon', 'Simon Fischer', 'count.numbers@web.de', 'password'); -- 1
+    ('admin', 'Administrator', 'example@example.com', 'password'); -- 1
 
 INSERT INTO contact (identifier, name, address1, zip, city, region, country, email) VALUES
     ('sender', 'The Sender', '5th Avenue', '12345', 'Vosshoefen', 'NRW', 'Germany', 'sender@example.com'); -- 1
