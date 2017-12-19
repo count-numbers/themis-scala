@@ -23,7 +23,7 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
   def rename(docId: Int, name: String, username: String): Future[Option[Document]] = {
     withDocAndUser(docId, username,
       _ => documentRepository.setName(docId, name).map((_, Unit)),
-      ActivityType.MarkedActionRequired, Seq(name))
+      ActivityType.Renamed, Seq(name))
       .map(_.map(_._1))
   }
 
@@ -135,8 +135,8 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
       user: Option[User]      <- userRepository.getByUsername(username)
       // now, do the actual action
       (success: Boolean, result: T)  <- user match {
-        case None => Future.successful(false)
-        case Some(user) => action()
+        case None => Future.failed(new Exception("user not found")) // this cannot happen since the user is logged in
+        case Some(user) => action.apply(Unit)
       }
       // register the activity if successful
       successAction: Boolean  <- if (success) {

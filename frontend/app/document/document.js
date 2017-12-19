@@ -57,24 +57,28 @@ angular.module('dms.document', ['ngRoute'])
     				Errors.add(response);
     			});
     	return true;
-    }
+    };
 
     // archiving complete
-    $scope.submittingArchivingComplete= false;
-    $scope.markComplete = function() {
-    	$scope.submittingArchivingComplete = true;
-    	Document.setArchivingComplete({docId:$routeParams.docid}, true,
-    			function(updatedDocument) {
-    				$scope.submittingArchivingComplete = false;
-    				$scope.document = updatedDocument;
-    				$scope.documentUpdated();
-    			},
-    			function (response) {
-    				$scope.submittingArchivingComplete = false;
-    				Errors.add(response);
-    			});
-    	return true;
-    }
+    $scope.archivingComplete = {
+        submittingArchivingComplete: false,
+        popoverOpen: false,
+        markComplete: function() {
+            $scope.submittingArchivingComplete = true;
+            Document.setArchivingComplete({docId:$routeParams.docid}, true,
+                    function(updatedDocument) {
+                        $scope.submittingArchivingComplete = false;
+                        $scope.document = updatedDocument;
+                        $scope.documentUpdated();
+                        $scope.archivingComplete.popoverOpen = false;
+                    },
+                    function (response) {
+                        $scope.submittingArchivingComplete = false;
+                        Errors.add(response);
+                    });
+            return true;
+        }
+    };
 
     // action required
     $scope.actionRequired = {

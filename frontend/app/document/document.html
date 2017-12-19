@@ -3,6 +3,15 @@
 <div ng-show="documentComplete">
 
 	<div>
+		<button ng-hide="document.archivingComplete" type="button" class="btn btn-danger" popover-template="'document/document-archiving-incomplete-popover.html'" popover-title="Archiving incomplete" popover-placement="bottom" popover-is-open="archivingComplete.popoverOpen">
+			<span class="glyphicon glyphicon-question-sign"></span> Incomplete
+		</button>
+
+		<button ng-show="document.actionRequired" type="button" class="btn btn-warning" popover-template="'document/document-action-required-popover.html'" popover-title="Resolve" type="button" popover-placement="bottom" class="btn btn-default" popover-is-open="actionRequired.popoverResolveOpen">
+			<span class="glyphicon glyphicon-exclamation-sign"></span>
+			Action required!
+		</button>
+
 		<button ng-hide="document.actionRequired" popover-template="'document/document-action-required-popover.html'" popover-title="Mark as 'action required'" type="button" popover-placement="bottom" class="btn btn-default" popover-is-open="actionRequired.popoverOpen">Action required</button>
 		<button ng-hide="document.followUpTimestamp" class="btn btn-default" popover-template="'document/document-set-followup.html'" popover-title="Set follow-up" type="button" popover-placement="bottom" popover-is-open="followUp.popoverOpen">Set follow-up</button>
 		<button class="btn btn-default" data-toggle="modal" data-target="#trelloModal" ng-click="populateTrelloList()">Create Trello card</button>
@@ -16,34 +25,13 @@
 		</h1>
 	</div>
 
-	<div class="alert alert-warning" ng-hide="document.archivingComplete">
-		<p>
-			<span class="glyphicon glyphicon-question-sign"></span>
-			<strong>Archiving data incomplete!</strong>
-		</p>
-		<p>
-			When documents are ingested into the system by a document source, we make a best-guess approach to determine its properties. Usually,
-			fields like title, etc. need to be checked by a human, and tags need to be assigned, before archiving of the document can be considered
-			complete. Please do so, and then mark this document as complete, by pressing the button on the right.  
-		</p>
-		<button class="btn btn-default" ng-click="markComplete()" ng-disabled="submittingArchivingComplete">Mark as complete</button><dms-loading-indicator loading="submittingArchivingComplete"></dms-loading-indicator>
-	</div>
-	<div class="alert alert-info" ng-show="document.actionRequired">
-		<p>
-			<span class="glyphicon glyphicon-exclamation-sign"></span>
-			<strong>Action required!</strong>
-		</p>
-		<p>
-			This document is marked as <em>action required</em>. An action could be sending a response or paying an invoice. Please read the comment feed to learn more about what is required for this particular document. After doing so, please click on &quot;Resolve&quot; below.
-			It is recommended to leave a comment before resolving. 
-		</p>
-		<button popover-template="'document/document-action-required-popover.html'" popover-title="Resolve" type="button" popover-placement="bottom" class="btn btn-default" popover-is-open="actionRequired.popoverResolveOpen">Resolve</button>
-	</div>
 
 	<div class="row">
 		<div class="col-sm-8">
 			<h3>Description <dms-loading-indicator loading="submittingDescription"></dms-loading-indicator></h3>
-			<dms-editable-markup value="{{document.description}}" submit="submitDescription(value)"></dms-editable-markup>
+			<div class="bs-callout bs-callout-info">
+				<dms-editable-markup value="{{document.description}}" submit="submitDescription(value)"></dms-editable-markup>
+			</div>
 		</div>
 		<div class="col-sm-4 vr-left">
 			<h3>Contact</h3>
