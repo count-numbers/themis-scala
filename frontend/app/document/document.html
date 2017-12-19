@@ -28,13 +28,15 @@
 
 	<div class="row">
 		<div class="col-sm-8">
-			<h3>Description <dms-loading-indicator loading="submittingDescription"></dms-loading-indicator></h3>
 			<div class="bs-callout bs-callout-info">
+				<h4><dms-loading-indicator loading="submittingDescription"></dms-loading-indicator></h4>
+
 				<dms-editable-markup value="{{document.description}}" submit="submitDescription(value)"></dms-editable-markup>
 			</div>
 		</div>
 		<div class="col-sm-4 vr-left">
-			<h3>Contact</h3>
+			<div class="bs-callout bs-callout-info">
+			<h4>Contact</h4>
 			<div ng-hide="editingContact" >
 				<button class="btn btn-xs btn-default pull-right" ng-click="toggleContactEdit()">
 					<span class="glyphicon glyphicon-pencil"></span>
@@ -59,7 +61,7 @@
 				<button class="btn btn-default skip-top-unrelated" ng-click="toggleContactEdit()">Cancel</button>
 			</div>
 			
-			<h3>Dates</h3>
+			<h4>Dates</h4>
 			<table class="key-value-table">
 				<tbody>
 					<tr>
@@ -96,15 +98,15 @@
 				</tbody>
 			</table>
 
-			<h3>Tags</h3>
+			<h4>Tags</h4>
 			<div>
 				<tags-input ng-model="document.tags" display-property="name" key-property="name" on-tag-added="addDocumentTag($tag)" on-tag-removed="deleteDocumentTag($tag)"> <auto-complete
 					source="loadTags($query)"></auto-complete> </tags-input>
 			</div>
 			
-			<h3>Links
+			<h4>Links
 				<a popover-template="'document/document-add-link-popover.html'" popover-title="Add link" type="button" popover-placement="bottom" class="btn btn-xs btn-default pull-right" popover-is-open="addLink.popoverOpen"><span class="glyphicon glyphicon-plus"></</span></a>
-			</h3>
+			</h4>
 			<ul class="link-list">
 				<li ng-repeat="link in document.links">
 					<a ng-href="{{link.url}}" target="_blank">
@@ -122,7 +124,8 @@
 					{{link.title}}
 					</a>
 				</li>
-			</ul>			
+			</ul>
+				</div>
 		</div>
 	</div>
 		

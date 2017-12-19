@@ -78,7 +78,7 @@ body {
 }
 
 .vr-left {
-	border-left: 1px solid #eee;
+	/*border-left: 1px solid #eee;*/
 }
 
 .editable-click, a.editable-click {
@@ -144,4 +144,10 @@ body {
 }
 .bs-callout-info h4 {
     color: #5bc0de;
+}
+.bs-callout h4 {
+    margin-top:2ex;
+}
+.bs-callout h4:first-child {
+    margin-top:0ex;
 }
