@@ -35,6 +35,9 @@ libraryDependencies ++= List(
   "com.typesafe.play" %% "play-mailer" % "5.0.0"
 )
 
+libraryDependencies ++= List(
+  "com.google.apis" % "google-api-services-drive" % "v2-rev298-1.23.0"
+)
 
 
 
@@ -47,7 +50,6 @@ lazy val slickCodeGenTask = (sourceManaged, dependencyClasspath in Compile, runn
   //  val url = "jdbc:h2:mem:play;INIT=runscript from 'sql/create.sql'"
   //  val jdbcDriver = "org.h2.Driver"
   //  val slickDriver = "slick.driver.H2Driver"
-
 
   val slickDriver = "slick.driver.PostgresDriver"
   //  val url = "jdbc:postgresql://localhost:5432/batman"

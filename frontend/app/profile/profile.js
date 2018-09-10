@@ -9,12 +9,13 @@ angular.module('dms.profile', ['ngRoute'])
   });
 }])
 
-.controller('ProfileCtrl', function($scope, $rootScope, User, AuthenticationService) {
+.controller('ProfileCtrl', function($scope, $rootScope, User, AuthenticationService, Configuration, $location) {
 	$scope.profile = $rootScope.profile;
 	
 	$scope.oldPassword = "";
 	$scope.newPassword = "";
 	$scope.newPasswordRepeat = "";
+
 	$scope.passwordsMatch = function() {
 		return $scope.newPassword == $scope.newPasswordRepeat;
 	}
@@ -37,4 +38,12 @@ angular.module('dms.profile', ['ngRoute'])
 				}
 			);
 	}
+
+	$scope.googleOAuthURL  = Configuration.backendURL + "rest/v1/google/oauthstart"
+  	$scope.googleTestURL   = Configuration.backendURL + "rest/v1/google/drive/list?id=1AhmeAXtkU2_B228e2CkXlIAOCjKBfEv5"
+  	$scope.googleRevokeURL = Configuration.backendURL + "rest/v1/google/oauthrevoke"
+
+    $scope.getGoogleAuthState = function() {
+        return $location.search().googleauth;
+    }
 });

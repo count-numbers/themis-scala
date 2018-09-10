@@ -1,7 +1,5 @@
 package models
 
-import java.time.LocalDateTime
-
 import db.Tables.{DocumentRow, ContactRow, DtagRow, UserRow}
 import play.api.libs.json.Json
 

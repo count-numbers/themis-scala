@@ -16,28 +16,25 @@
 		</h1>
 	</div>
 
-	<div class="alert alert-warning" ng-hide="document.archivingComplete">
-		<p>
+	<div class="alert alert-danger" ng-hide="document.archivingComplete">
+		<h4>
 			<span class="glyphicon glyphicon-question-sign"></span>
-			<strong>Archiving data incomplete!</strong>
-		</p>
+			<strong>Please review!</strong>
+		</h4>
 		<p>
-			When documents are ingested into the system by a document source, we make a best-guess approach to determine its properties. Usually,
-			fields like title, etc. need to be checked by a human, and tags need to be assigned, before archiving of the document can be considered
-			complete. Please do so, and then mark this document as complete, by pressing the button on the right.  
+			This document was automatically ingested into the system. Please review whether there are any mistakes, tag it, and when all looks good, confirm.
 		</p>
-		<button class="btn btn-default" ng-click="markComplete()" ng-disabled="submittingArchivingComplete">Mark as complete</button><dms-loading-indicator loading="submittingArchivingComplete"></dms-loading-indicator>
+		<button class="btn btn-default" ng-click="markComplete()" ng-disabled="submittingArchivingComplete">Looks good to me!</button><dms-loading-indicator loading="submittingArchivingComplete"></dms-loading-indicator>
 	</div>
 	<div class="alert alert-info" ng-show="document.actionRequired">
-		<p>
+		<h4>
 			<span class="glyphicon glyphicon-exclamation-sign"></span>
-			<strong>Action required!</strong>
-		</p>
+			<strong>Something to do here!</strong>
+		</h4>
 		<p>
-			This document is marked as <em>action required</em>. An action could be sending a response or paying an invoice. Please read the comment feed to learn more about what is required for this particular document. After doing so, please click on &quot;Resolve&quot; below.
-			It is recommended to leave a comment before resolving. 
+			This document was marked since it requires attention, such as sending a response or paying an invoice. If you are clueless what this could be, chances are you'll find a hint in the comments.
 		</p>
-		<button popover-template="'document/document-action-required-popover.html'" popover-title="Resolve" type="button" popover-placement="bottom" class="btn btn-default" popover-is-open="actionRequired.popoverResolveOpen">Resolve</button>
+		<button popover-template="'document/document-action-required-popover.html'" popover-title="Resolve" type="button" popover-placement="bottom" class="btn btn-default" popover-is-open="actionRequired.popoverResolveOpen">This needs no further attention - resolved!</button>
 	</div>
 
 	<div class="row">

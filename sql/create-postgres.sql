@@ -93,6 +93,11 @@ CREATE TABLE activity (
 );
 
 
+CREATE TABLE config (
+    key  VARCHAR NOT NULL PRIMARY KEY,
+    value VARCHAR NOT NULL
+);
+
 -- Fulltext setup. Create trigger to concatenate name and description into fulltext column and create index
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
 ON document FOR EACH ROW EXECUTE PROCEDURE
@@ -100,43 +105,9 @@ tsvector_update_trigger(fulltext, 'pg_catalog.english', name, description);
 
 CREATE INDEX textsearch_idx ON document USING GIN (fulltext);
 
-
-
-
 INSERT INTO "user" (username, name, email, password) VALUES
     ('admin', 'Administrator', 'example@example.com', 'password'); -- 1
 
-INSERT INTO contact (identifier, name, address1, zip, city, region, country, email) VALUES
-    ('sender', 'The Sender', '5th Avenue', '12345', 'Vosshoefen', 'NRW', 'Germany', 'sender@example.com'); -- 1
-
-INSERT INTO document (name, description, owner, contact, archiveTimestamp, modificationTimestamp, sourceId, sourceReference, archivingComplete, actionRequired) VALUES
-  ('Spotflix Prime Invoice', 'Invoice for your entertainment package', 1, NULL, '2017-01-15 08:00', '2017-01-16 14:30', 'demo', 'demo-1', FALSE, TRUE), -- 1
-  ('Homesafe', 'Send the funds and sleep well.', 1, 1, '2017-02-07 09:00', '2017-02-21 19:00', 'demo', 'demo-2', FALSE, TRUE);                       -- 2
-
-INSERT INTO dtag (name) VALUES
-    ('invoice'),        -- 1
-    ('information'),    -- 2
-    ('insurance'),      -- 3
-    ('private'),        -- 4
-    ('home');           -- 5
-
-INSERT INTO tagging (docId, tagId) VALUES
-    (1, 1),
-    (1, 4),
-    (2, 1),
-    (2, 3),
-    (2, 5);
-
-INSERT INTO comment (docId, userId, text, timestamp) VALUES
-    (2, 1, 'This is a comment', '2017-02-14 10:00'),
-    (2, 1, 'Here is another comment', '2017-02-17 15:00');
-
-INSERT INTO link (docId, title, url, linkType) VALUES
-    (2, 'External link', 'http://example.com', 'WEB_LINK'),
-    (2, 'Trello Card', 'http://trello.com', 'TRELLO_CARD');
-
-INSERT INTO activity (docId, userId, activityType, arguments, timestamp) VALUES
-    (2, 1, 'CREATED', NULL, '2017-02-16 11:30');
-
-INSERT INTO attachment (docId, name, size, mimeType) VALUES
-    (2, 'scan-1234.pdf', 12000, 'application/pdf');
+-- This may be useful:
+-- INSERT INTO config VALUES ('google.oauth.client_id', 'xxx');
+-- INSERT INTO config VALUES ('google.oauth.client_secret', 'xxx');

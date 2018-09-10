@@ -22,6 +22,21 @@
 	</tbody>
 </table>
 
+<div>
+	<h3>Google</h3>
+	<ul>
+		<li><a href="{{googleOAuthURL}}">Authorize Google</a></li>
+		<li><a href="{{googleRevokeURL}}">Revoke authorization</a></li>
+		<li><a href="{{googleTestURL}}">Test Google</a></li>
+	</ul>
+	<div ng-switch="getGoogleAuthState()">
+		<div ng-switch-when="skipped" class="alert alert-success"><strong>Success.</strong> Authorization to Google Drive was already granted. Re-using existing token.</div>
+		<div ng-switch-when="success" class="alert alert-success"><strong>Success.</strong> Successfully authorized to access Google Drive account.</div>
+		<div ng-switch-when="revoked" class="alert alert-success"><strong>Revoked.</strong> Revoked authorization to access Google Drive account.</div>
+		<div ng-switch-when="error" class="alert alert-danger"><strong>Error.</strong> Access to Google Drive account not authorized.</div>
+	</div>
+</div>
+
 
 <!-- Modal -->
 <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel">

@@ -33,50 +33,50 @@
 				<a class="navbar-brand" href="#/home"><span class="glyphicon glyphicon-book"></span>&nbsp;Themis</a>
 			</div>
 
-<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			<ul class="nav navbar-nav">
-				<li><a href="#documents">Documents</a></li>
-				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contacts<span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li><a href="#contact/new">New</a></li>
-						<li><a href="#contacts">Search</a></li>			
-					</ul>
-			</ul>
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li><a href="#documents">Documents</a></li>
+					<li class="dropdown">
+						<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contacts<span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#contact/new">New</a></li>
+							<li><a href="#contacts">Search</a></li>
+						</ul>
+				</ul>
 
-			<form class="navbar-form navbar-left" role="search" ng-controller="SearchFormCtrl">
-				<div class="input-group">
-					<input id="q" name="q" type="text" class="form-control"
-						placeholder="Search" ng-model="searchFormService.term">
-					<span class="input-group-btn">
-						<button type="submit" class="btn btn-default" ng-click="startSearch()" ng-disabled="!searchFormService.term">
-							<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-						</button>
-					</span>
-				</div>
-			</form>
+				<form class="navbar-form navbar-left" role="search" ng-controller="SearchFormCtrl">
+					<div class="input-group">
+						<input id="q" name="q" type="text" class="form-control"
+							placeholder="Search" ng-model="searchFormService.term">
+						<span class="input-group-btn">
+							<button type="submit" class="btn btn-default" ng-click="startSearch()" ng-disabled="!searchFormService.term">
+								<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+							</button>
+						</span>
+					</div>
+				</form>
 
-			<ul class="nav navbar-nav navbar-right" ng-show="profile.username" ng-cloak>
-				<li ng-controller="ProfileDropdownCtrl" class="dropdown">
-					<a class="dropdown-toggle"
-					data-toggle="dropdown" role="button" aria-haspopup="true"
-					aria-expanded="false"><span class="glyphicon glyphicon-user"
-						aria-hidden="true"></span>&nbsp;{{profile.email}}<span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li><a href="#/profile">Profile</a></li>
-						<li><a ng-click="logout()">Logout</a></li>
-					</ul>
-				</li>
-				<li ng-show="profile.admin" class="dropdown"><a class="dropdown-toggle"
-					data-toggle="dropdown" role="button" aria-haspopup="true"
-					aria-expanded="false">
-					<span class="glyphicon glyphicon-cog" aria-hidden="true"></span><span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li><a href="#/admin">Settings</a></li>
-					</ul>
-				</li>
-			</ul>
-		</div>
+				<ul class="nav navbar-nav navbar-right" ng-show="profile.username" ng-cloak>
+					<li ng-controller="ProfileDropdownCtrl" class="dropdown">
+						<a class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false"><span class="glyphicon glyphicon-user"
+							aria-hidden="true"></span>&nbsp;{{profile.email}}<span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#/profile">Profile</a></li>
+							<li><a ng-click="logout()">Logout</a></li>
+						</ul>
+					</li>
+					<li ng-show="profile.username == 'admin'" class="dropdown"><a class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false">
+						<span class="glyphicon glyphicon-cog" aria-hidden="true"></span><span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#/admin">Settings</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
 		</div>
 	</nav>
 
