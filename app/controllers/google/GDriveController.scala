@@ -17,10 +17,10 @@ class GDriveController @Inject()(val config: Configuration, val configRepo: Conf
                                  val gDriveClientFactory: GDriveClientFactory,
                                  implicit val exec: ExecutionContext) extends Controller {
 
-  def listFolder(id: Option[String]) = AuthAction().async {
+  def listFolder(id: String) = AuthAction().async {
        implicit req => {
          val gdrive: GDriveClient = gDriveClientFactory.build(req.username)
-         val files: Try[Seq[GDriveFile]] = gdrive.listFolder(id)
+         val files: Try[Seq[GDriveFile]] = gdrive.listFolder(Some(id))
 
          val r: Result = files match {
            case Failure(ex: Throwable) => BadRequest(ex.getMessage)

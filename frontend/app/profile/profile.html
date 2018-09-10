@@ -23,18 +23,32 @@
 </table>
 
 <div>
-	<h3>Google</h3>
-	<ul>
-		<li><a href="{{googleOAuthURL}}">Authorize Google</a></li>
-		<li><a href="{{googleRevokeURL}}">Revoke authorization</a></li>
-		<li><a href="{{googleTestURL}}">Test Google</a></li>
-	</ul>
-	<div ng-switch="getGoogleAuthState()">
-		<div ng-switch-when="skipped" class="alert alert-success"><strong>Success.</strong> Authorization to Google Drive was already granted. Re-using existing token.</div>
-		<div ng-switch-when="success" class="alert alert-success"><strong>Success.</strong> Successfully authorized to access Google Drive account.</div>
-		<div ng-switch-when="revoked" class="alert alert-success"><strong>Revoked.</strong> Revoked authorization to access Google Drive account.</div>
-		<div ng-switch-when="error" class="alert alert-danger"><strong>Error.</strong> Access to Google Drive account not authorized.</div>
+
+	<div class="panel panel-primary">
+		<div class="panel-heading">GDrive Integration</div>
+		<div class="panel-body">
+			<div ng-switch="getGoogleAuthState()">
+				<div ng-switch-when="skipped" class="alert alert-success"><strong>Success.</strong> Authorization to Google Drive was already granted. Re-using existing token.</div>
+				<div ng-switch-when="success" class="alert alert-success"><strong>Success.</strong> Successfully authorized to access Google Drive account.</div>
+				<div ng-switch-when="revoked" class="alert alert-success"><strong>Revoked.</strong> Revoked authorization to access Google Drive account.</div>
+				<div ng-switch-when="error" class="alert alert-danger"><strong>Error.</strong> Access to Google Drive account not authorized.</div>
+			</div>
+
+			<a class="btn btn-primary" role="button" href="{{googleOAuthURL}}">Authorize Google</a>
+			<a class="btn btn-primary" role="button" href="{{googleRevokeURL}}">Revoke authorization</a>
+
+			<div>
+				<h3>Contents of {{gdrive.folderName}}</h3>
+				<dms-loading-indicator loading="gdrive.loading"></dms-loading-indicator>
+				<div ng-show="!gdrive.folders.length && !gdrive.loading">(empty)</div>
+				<ul class="list-group">
+					<li ng-repeat="file in gdrive.folders" ng-click="gdrive.setFolder(file)" class="list-group-item">{{file.name}}</li>
+				</ul>
+			</div>
+
+		</div>
 	</div>
+
 </div>
 
 

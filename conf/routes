@@ -51,7 +51,7 @@ GET     /tags                                   controllers.TagController.search
 GET     /google/oauthstart                      controllers.google.OAuthController.oauthStart()
 GET     /google/oauthreturn                     controllers.google.OAuthController.oauthReturn(code: Option[String])
 GET     /google/oauthrevoke                     controllers.google.OAuthController.oauthRevoke()
-GET     /google/drive/list                      controllers.google.GDriveController.listFolder(id: Option[String])
+GET     /google/drive/:id                       controllers.google.GDriveController.listFolder(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

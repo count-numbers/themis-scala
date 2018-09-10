@@ -96,10 +96,10 @@ class GDriveClientFactory @Inject()(val configRepo: ConfigRepository) {
   }
 }
 
-case class GDriveFile(id: String, name: String, size: Option[Long])
+case class GDriveFile(mimeType: String, id: String, name: String, size: Option[Long])
 object GDriveFile {
   implicit val writesGDriveFile = Json.writes[GDriveFile]
-  def of(f: File) = GDriveFile(f.getId, f.getTitle, Option(f.getFileSize).map(_.longValue()))
+  def of(f: File) = GDriveFile(f.getMimeType, f.getId, f.getTitle, Option(f.getFileSize).map(_.longValue()))
 }
 
 case class GDriveClient(user: String, clientId: String, clientSecret: String, val configRepo: ConfigRepository) {
