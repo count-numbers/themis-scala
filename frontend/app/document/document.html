@@ -80,12 +80,23 @@
 						<td>{{document.archiveTimestamp | date:'short'}}</td>
 					</tr>
 					<tr>
+						<td>Importer</td>
+						<td>
+							<span ng-show="document.sourceId">
+								{{document.sourceId}}
+							</span>
+							<em ng-hide="document.sourceId">
+								unknown
+							</em>
+						</td>
+					</tr>
+					<tr>
 						<td>Source</td>
 						<td>
-							<span ng-show="document.sourceId || document.sourceReference">
-								{{document.sourceId}} ({{document.sourceReference}})
+							<span ng-show="document.sourceReference">
+								{{document.sourceReference}}
 							</span>
-							<em ng-hide="document.sourceId || document.sourceReference">
+							<em ng-hide="document.sourceReference">
 								unknown
 							</em>
 						</td>

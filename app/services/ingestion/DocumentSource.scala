@@ -31,12 +31,14 @@ abstract class DocumentSource[T](sourceId: String,
   val tempDir: Path = Paths.get(config.getString("themis.temp.dir").get)
 
 
-  def findDocuments: Seq[(String,T)]
+  def findDocuments: Seq[(String,String,T)]
 
   def importToTemp(t: T): Path
 
   def run() = {
-    for ((name: String, input: T) <- findDocuments) {
+    val found: Seq[(String, String, T)] = findDocuments
+    Logger.debug(s"Found ${found.length} new docs for ${sourceId}.")
+    for ((name: String, sourceRef: String, input: T) <- found) {
       val file: Path = importToTemp(input)
 
       Logger.info(s"Received incoming file ${file}.")
@@ -54,7 +56,7 @@ abstract class DocumentSource[T](sourceId: String,
           description = description,
           ownerUsername = username,
           sourceId = sourceId,
-          sourceReference = file.toAbsolutePath.toString)
+          sourceReference = sourceRef)
         attachmentId: Option[Int] <- documentActions.addAttachment(docId = docId, name = name, size = size, mimeType = mimeType, username = username)
       } yield {
         Logger.debug(s"Assigned new document ID ${docId}, attachment ${attachmentId}.")

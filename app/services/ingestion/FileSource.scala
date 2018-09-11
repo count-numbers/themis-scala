@@ -10,23 +10,22 @@ import services.thumbnail.ThumbnailService
 import scala.concurrent.{ExecutionContext}
 
 /** Imports files from a given fixed source folder. */
-class FileSource(sourceId: String,
+class FileSource( username: String,
                   sourceDir: Path,
-                  username: String,
                   config: Configuration,
                   documentActions: DocumentActions,
                   thumbnailService: ThumbnailService,
                   contentExtractorService: ContentExtractorService,
                   ingestionNotifier: IngestionNotifier,
                   executionContext: ExecutionContext)
-  extends DocumentSource[Path](sourceId, username, config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext) {
+  extends DocumentSource[Path]("file", username, config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext) {
 
   import scala.collection.JavaConverters._
 
-  override def findDocuments: Seq[(String, Path)] = {
+  override def findDocuments: Seq[(String, String, Path)] = {
     for (incomingFile: Path <- Files.newDirectoryStream(sourceDir).asScala.toSeq) yield {
       val name = incomingFile.getName(incomingFile.getNameCount-1).toString
-      (name, incomingFile)
+      (name, incomingFile.toString, incomingFile)
     }
   }
 

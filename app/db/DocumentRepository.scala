@@ -168,10 +168,10 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
       (((doc, user), tagging), tag) <- (db.Tables.Document
         joinLeft db.Tables.User on (_.owner === _.id)
         joinLeft db.Tables.Tagging on (_._1.id === _.docid)
-        joinLeft db.Tables.Dtag on (_._2.map(_.tagid) === _.id)) if (!doc.archivingcomplete || doc.actionrequired)
+        joinLeft db.Tables.Dtag on (_._2.map(_.tagid) === _.id)).sortBy(_._1._1._1.archivetimestamp.asc) if (!doc.archivingcomplete || doc.actionrequired)
     } yield (doc, user, tag)
 
-    val resultFuture: Future[Seq[(DocumentRow, Option[UserRow], Option[DtagRow])]] = dbConfig.db.run(query.drop(offset).take(limit).result)
+    val resultFuture: Future[Seq[(DocumentRow, Option[UserRow], Option[DtagRow])]] = dbConfig.db.run(query.drop(offset).result) //take(limit).result)
 
     for {
       allRows: Seq[(DocumentRow, Option[Tables.UserRow], Option[DtagRow])] <- resultFuture

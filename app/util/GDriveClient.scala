@@ -96,10 +96,10 @@ class GDriveClientFactory @Inject()(val configRepo: ConfigRepository, implicit v
   }
 }
 
-case class GDriveFile(mimeType: String, id: String, name: String, size: Option[Long])
+case class GDriveFile(mimeType: String, id: String, name: String, embedLink: String, size: Option[Long])
 object GDriveFile {
   implicit val writesGDriveFile = Json.writes[GDriveFile]
-  def of(f: File) = GDriveFile(f.getMimeType, f.getId, f.getTitle, Option(f.getFileSize).map(_.longValue()))
+  def of(f: File) = GDriveFile(f.getMimeType, f.getId, f.getTitle, f.getEmbedLink, Option(f.getFileSize).map(_.longValue()))
 }
 
 case class GDriveClient(user: String, clientId: String, clientSecret: String, val configRepo: ConfigRepository, implicit val executionContext: ExecutionContext) {
@@ -109,7 +109,7 @@ case class GDriveClient(user: String, clientId: String, clientSecret: String, va
     JacksonFactory.getDefaultInstance(),
     clientId,
     clientSecret,
-    Collections.singletonList(DriveScopes.DRIVE_READONLY))
+    Collections.singletonList(DriveScopes.DRIVE))
     .setDataStoreFactory(new ConfigRepoDataStoreFactory(configRepo))
     .setAccessType("offline")
     .setApprovalPrompt("force")
@@ -135,8 +135,8 @@ case class GDriveClient(user: String, clientId: String, clientSecret: String, va
       for {
         child <- rawChildren.getItems.asScala
       } yield {
-        val f: File = drive.files().get(child.getId).setFields("id,title,mimeType,fileSize")execute()
-        Logger.info(s"Child: ${f}")
+        val f: File = drive.files().get(child.getId).setFields("id,title,mimeType,fileSize,selfLink,embedLink,downloadUrl")execute()
+        Logger.debug(s"Found file: ${f}")
         GDriveFile.of(f)
       }
     }

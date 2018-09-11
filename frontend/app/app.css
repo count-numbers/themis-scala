@@ -18,7 +18,7 @@ body {
 .key-value-table tbody tr td:FIRST-CHILD {
 	color: #888;
 	padding-right: 2ex;
-	vertical-align: middle;
+	vertical-align: top;
 }
 
 .key-value-table tbody tr td:FIRST-CHILD:AFTER {
