@@ -84,7 +84,7 @@ class ConfigRepoDataStoreFactory(configRepository: ConfigRepository) extends Abs
 
 
 @Singleton
-class GDriveClientFactory @Inject()(val configRepo: ConfigRepository) {
+class GDriveClientFactory @Inject()(val configRepo: ConfigRepository, implicit val executionContext: ExecutionContext) {
 
   def clientId: String = configRepo.getForKeySync("google.oauth.client_id").get
   def clientSecret: String = configRepo.getForKeySync("google.oauth.client_secret").get
@@ -92,7 +92,7 @@ class GDriveClientFactory @Inject()(val configRepo: ConfigRepository) {
     /** Builds a new auth flow */
   def build(user: String): GDriveClient = {
       Logger.debug(s"Creating GDrive client with ID ${clientId} and secret ${clientSecret}.")
-      GDriveClient(user, clientId, clientSecret, configRepo)
+      GDriveClient(user, clientId, clientSecret, configRepo, executionContext)
   }
 }
 
@@ -102,7 +102,7 @@ object GDriveFile {
   def of(f: File) = GDriveFile(f.getMimeType, f.getId, f.getTitle, Option(f.getFileSize).map(_.longValue()))
 }
 
-case class GDriveClient(user: String, clientId: String, clientSecret: String, val configRepo: ConfigRepository) {
+case class GDriveClient(user: String, clientId: String, clientSecret: String, val configRepo: ConfigRepository, implicit val executionContext: ExecutionContext) {
 
   lazy val authCodeFlow = new GoogleAuthorizationCodeFlow.Builder(
     new NetHttpTransport(),
@@ -116,26 +116,29 @@ case class GDriveClient(user: String, clientId: String, clientSecret: String, va
     .build()
 
 
-  // TODO: Make this a promise
-  def listFolder(folderId: Option[String]): Try[Seq[GDriveFile]] = {
+  lazy val drive: Drive = {
     val credentialOpt = Option(authCodeFlow.loadCredential(user))
-
-    import collection.JavaConverters._
-
     credentialOpt match {
-      case None => Failure(new IllegalStateException("Not yet authorized with Google"))
+      case None => {
+        throw new IllegalStateException("Not yet authorized with Google.")
+      }
       case Some(credential) =>
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport
-        val drive = new Drive.Builder(httpTransport, JacksonFactory.getDefaultInstance(), credential).setApplicationName("themis-server").build()
-        val rawChildren: ChildList = drive.children().list(folderId.getOrElse("root")).execute()
-        val children: Seq[GDriveFile] = for {
-          child <- rawChildren.getItems.asScala
-        } yield {
-          val f: File = drive.files().get(child.getId).execute()
-          Logger.info(s"Child: ${f}")
-          GDriveFile.of(f)
-        }
-        Success(children)
+        new Drive.Builder(httpTransport, JacksonFactory.getDefaultInstance(), credential).setApplicationName("themis-server").build()
+    }
+  }
+
+  def listFolder(folderId: Option[String]): Future[Seq[GDriveFile]] = {
+    import collection.JavaConverters._
+    Future {
+      val rawChildren: ChildList = drive.children().list(folderId.getOrElse("root")).execute()
+      for {
+        child <- rawChildren.getItems.asScala
+      } yield {
+        val f: File = drive.files().get(child.getId).setFields("id,title,mimeType,fileSize")execute()
+        Logger.info(s"Child: ${f}")
+        GDriveFile.of(f)
+      }
     }
   }
 }

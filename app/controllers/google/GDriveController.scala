@@ -6,11 +6,10 @@ import auth.AuthAction
 import db.ConfigRepository
 import play.api.libs.json.Json
 import play.api.mvc._
-import play.api.{Configuration, Logger}
-import util.{GDriveClient, GDriveClientFactory, GDriveFile}
+import play.api.{Configuration}
+import util.{GDriveClient, GDriveClientFactory}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.{ExecutionContext}
 
 @Singleton
 class GDriveController @Inject()(val config: Configuration, val configRepo: ConfigRepository,
@@ -20,13 +19,10 @@ class GDriveController @Inject()(val config: Configuration, val configRepo: Conf
   def listFolder(id: String) = AuthAction().async {
        implicit req => {
          val gdrive: GDriveClient = gDriveClientFactory.build(req.username)
-         val files: Try[Seq[GDriveFile]] = gdrive.listFolder(Some(id))
-
-         val r: Result = files match {
-           case Failure(ex: Throwable) => BadRequest(ex.getMessage)
-           case Success(children) => Ok(Json.toJson(children))
-         }
-         Future(r)
+         gdrive
+           .listFolder(Some(id))
+           .map(f => Ok(Json.toJson(f)))
+           .recover{case ex: IllegalStateException => BadRequest(ex.getMessage)}
        }
      }
 }

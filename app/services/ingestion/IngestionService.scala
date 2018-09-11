@@ -1,17 +1,17 @@
 package services.ingestion
 
-import java.nio.file.{DirectoryStream, Files, Path, Paths}
+import java.nio.file.{Paths}
 import javax.inject.{Named, Singleton}
 
 import actions.DocumentActions
 import akka.actor.{Actor, ActorRef, ActorSystem}
 import com.google.inject.Inject
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext}
 
 @Singleton
 class IngestionService @Inject() (val config: Configuration,
@@ -22,42 +22,31 @@ class IngestionService @Inject() (val config: Configuration,
 }
 
 /**
-  * Created by simfischer on 3/21/17.
   */
 @Singleton
 class IngestionServiceActor @Inject() (val config: Configuration, val ingestionNotifier: IngestionNotifier)
                                       (implicit val documentActions: DocumentActions,
                                        val thumbnailService: ThumbnailService,
                                        val contentExtractorService: ContentExtractorService,
-                                       val ec: ExecutionContext) extends Actor {
+                                       val executionContext: ExecutionContext) extends Actor {
 
-  def fileSource: Option[FileSource] = for {
-    sourceDir <- config.getString("themis.source.dir")
-    destinationDir <- config.getString("themis.storage.dir")
-    tempDir <- config.getString("themis.temp.dir")
-    username <- config.getString("themis.source.user")
-  } yield {
-    FileSource(sourceId = "file",
-      sourceDir = Paths.get(sourceDir),
-      destinationDir = Paths.get(destinationDir),
-      tempDir = Paths.get(tempDir),
-      username = username)
-  }
+  val fileSource = new FileSource(
+    sourceId = "file",
+    sourceDir = Paths.get(config.getString("themis.source.dir").get),
+    username = config.getString("themis.source.user").get,
+    config = config,
+    documentActions = documentActions,
+    thumbnailService = thumbnailService,
+    contentExtractorService = contentExtractorService,
+    ingestionNotifier = ingestionNotifier,
+    executionContext = executionContext
+  )
 
   override def receive: Receive = {
       case msg: String => {
-        println(s"Got event: ${msg}")
+        Logger.info(s"Running ingestion service: ${msg}")
 
-        fileSource.foreach(_.scanForNewFiles().andThen(ingestionNotifier.notify(_)))
-/*
-        for {
-          source: FileSource <- fileSource
-          docFuture: Future[Int] <- source.scanForNewFiles()
-          docId: Int <- docFuture
-        } {
-          //ingestionNotifier.notify(docId)
-        }
-        */
+        fileSource.run
       }
   }
 }
