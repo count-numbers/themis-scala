@@ -18,8 +18,8 @@ import scala.concurrent.ExecutionContext
   * A series of operation is then performed on the temp document: thumbnail and content are extracted, the document
   * record is created in the database, and the file itself is moved as an attachment to the final storage folder.
   * Eventually, the IngestionNotifier is executed. */
-abstract class DocumentSource[T](sourceId: String,
-                                 username: String,
+abstract class DocumentSource[T](val sourceId: String,
+                                 val username: String,
                                  config: Configuration,
                                  documentActions: DocumentActions,
                                  thumbnailService: ThumbnailService,

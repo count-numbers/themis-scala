@@ -6,14 +6,14 @@ import javax.inject.{Named, Singleton}
 import actions.DocumentActions
 import akka.actor.{Actor, ActorRef, ActorSystem}
 import com.google.inject.Inject
-import db.ConfigRepository
+import db.{SourceRepository, Tables}
 import play.api.{Configuration, Logger}
 import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
 import util.GDriveClientFactory
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
 
 @Singleton
 class IngestionService @Inject() (val config: Configuration,
@@ -27,54 +27,43 @@ class IngestionService @Inject() (val config: Configuration,
   */
 @Singleton
 class IngestionServiceActor @Inject() (val config: Configuration, val ingestionNotifier: IngestionNotifier,
-                                       val gDriveClientFactory: GDriveClientFactory)
-                                      (val configRepository: ConfigRepository,
+                                       val gDriveClientFactory: GDriveClientFactory,
+                                       val sourceRepository: SourceRepository,
                                        val documentActions: DocumentActions,
                                        val thumbnailService: ThumbnailService,
                                        val contentExtractorService: ContentExtractorService,
-                                       val executionContext: ExecutionContext) extends Actor {
-
-  val fileSource = new FileSource(
-    username = config.getString("themis.source.user").get,
-    sourceDir = Paths.get(config.getString("themis.source.dir").get),
-    config = config,
-    documentActions = documentActions,
-    thumbnailService = thumbnailService,
-    contentExtractorService = contentExtractorService,
-    ingestionNotifier = ingestionNotifier,
-    executionContext = executionContext
-  )
-
-  val gdriveSource: Option[GDriveSource] =
-    for {
-      sourceFolderId: String <- configRepository.getForKeySync("source.gdrive.source_folder_id")
-      archiveFolderId: String <- configRepository.getForKeySync("source.gdrive.archive_folder_id")
-    } yield {
-      new GDriveSource(
-        username = "admin",
-
-        sourceFolderID = sourceFolderId,
-        archiveFolderID = archiveFolderId,
-        gdrive = gDriveClientFactory.build("admin"),
-
-        config = config,
-        documentActions = documentActions,
-        thumbnailService = thumbnailService,
-        contentExtractorService = contentExtractorService,
-        ingestionNotifier = ingestionNotifier,
-        executionContext = executionContext
-      )
-    }
-
-  Logger.info(s"GDrive source configured: ${gdriveSource.isDefined}")
+                                       implicit val executionContext: ExecutionContext) extends Actor {
 
   override def receive: Receive = {
-      case msg: String => {
-        Logger.info(s"Running ingestion service: ${msg}")
+    case msg: String => {
+      Logger.info(s"Running ingestion service: ${msg}")
 
-        fileSource.run
+      for {
+        sources: Seq[(Tables.SourceRow, Option[Tables.UserRow])] <- sourceRepository.getAll()
+        sourceAndUser: (Tables.SourceRow, Option[Tables.UserRow]) <- sources
+      } {
+        Logger.debug(s"Found document source configuration: ${sourceAndUser}")
 
-        gdriveSource.foreach(_.run)
+        val source: Option[DocumentSource[_]] = sourceAndUser match {
+          case (Tables.SourceRow(_, "gdrive", _, Some(gdriveSourceFolder: String), Some(gdriveArchiveFolder: String), _),
+            Some(Tables.UserRow(_, username: String, _, _, _)))
+          => Some(new GDriveSource(username, gdriveSourceFolder, gdriveArchiveFolder,
+              gDriveClientFactory.build(username), config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext))
+
+          case (Tables.SourceRow(_, "file", _, _, _, Some(fileSourceFolder: String)),
+            Some(Tables.UserRow(_, username: String, _, _, _)))
+          =>
+            Some(new FileSource(username, Paths.get(fileSourceFolder), config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext))
+
+          case _ => { Logger.warn(s"Illegal or incomplete source definition${sourceAndUser}."); None }
+        }
+
+
+        source.foreach(source => {
+          Logger.info(s"Executing document source ${source.sourceId} for user ${source.username}.")
+          source.run
+        })
       }
+    }
   }
 }

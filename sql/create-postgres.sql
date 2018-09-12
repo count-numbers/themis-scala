@@ -1,3 +1,4 @@
+DROP TABLE "source";
 DROP TABLE tagging;
 DROP TABLE dtag;
 DROP TABLE comment;
@@ -7,10 +8,11 @@ DROP TABLE activity;
 DROP TABLE document;
 DROP TABLE "user";
 DROP TABLE contact;
+DROP TABLE "config";
 
 CREATE TABLE "user" (
    id SERIAL PRIMARY KEY,
-   username VARCHAR NOT NULL,
+   username VARCHAR NOT NULL UNIQUE,
    name VARCHAR NOT NULL,
    email VARCHAR NOT NULL,
    password VARCHAR NOT NULL
@@ -96,6 +98,15 @@ CREATE TABLE activity (
 CREATE TABLE config (
     key  VARCHAR NOT NULL PRIMARY KEY,
     value VARCHAR NOT NULL
+);
+
+CREATE TABLE source (
+    id SERIAL PRIMARY KEY,
+    type VARCHAR NOT NULL,
+    "userId" INT REFERENCES "user"(id) NOT NULL,
+    "gdriveSourceFolder" VARCHAR,
+    "gdriveArchiveFolder" VARCHAR,
+    "fileSourceFolder" VARCHAR
 );
 
 -- Fulltext setup. Create trigger to concatenate name and description into fulltext column and create index
