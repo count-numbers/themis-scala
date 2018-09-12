@@ -9,7 +9,7 @@ angular.module('dms.profile', ['ngRoute'])
   });
 }])
 
-.controller('ProfileCtrl', function($scope, $rootScope, User, AuthenticationService, Configuration, $location, GDrive, Errors) {
+.controller('ProfileCtrl', function($scope, $rootScope, User, AuthenticationService, Configuration, DocumentSources, $location, GDrive, Errors) {
 	$scope.profile = $rootScope.profile;
 	
 	$scope.oldPassword = "";
@@ -46,6 +46,8 @@ angular.module('dms.profile', ['ngRoute'])
     $scope.getGoogleAuthState = function() {
         return $location.search().googleauth;
     }
+
+    $scope.sources = DocumentSources.query();
 
     $scope.gdrive = {
         loading: true,

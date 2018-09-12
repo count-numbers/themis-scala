@@ -1,12 +1,10 @@
 package db
 
 import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
 
-import db.Tables.{profile, _}
+import db.Tables._
 import db.Tables.profile.api._
-import javax.inject.Inject
-import javax.inject.Singleton
-
 import models.{Activity, Attachment, Comment, Document, Link}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,7 +13,7 @@ import slick.backend.DatabaseConfig
 import slick.dbio.DBIOAction
 import slick.dbio.Effect.{Read, Write}
 import slick.driver.JdbcProfile
-import slick.lifted.{QueryBase, SimpleExpression}
+import slick.lifted.SimpleExpression
 
 import scala.concurrent.{ExecutionContext, Future}
 

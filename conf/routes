@@ -47,6 +47,9 @@ GET     /activities                             controllers.ActivitiesController
 # Tags
 GET     /tags                                   controllers.TagController.search(q: String)
 
+# Source configurations
+GET     /sources                                controllers.SourceController.getMine()
+
 # Google OAuth flow
 GET     /google/oauthstart                      controllers.google.OAuthController.oauthStart()
 GET     /google/oauthreturn                     controllers.google.OAuthController.oauthReturn(code: Option[String])

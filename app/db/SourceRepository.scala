@@ -2,6 +2,7 @@ package db
 
 import javax.inject.{Inject, Singleton}
 
+import db.Tables._
 import db.Tables.profile.api._
 import play.api.db.slick.DatabaseConfigProvider
 import slick.backend.DatabaseConfig
@@ -28,5 +29,13 @@ class SourceRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider, i
     val q = Tables.Source joinLeft Tables.User on (_.userid === _.id)
     dbConfig.db
       .run(q.result)
+  }
+
+  def getAllForUser(username: String): Future[Seq[_root_.db.Tables.SourceRow]] = {
+    val query = for {
+      (source, user) <- db.Tables.Source joinLeft db.Tables.User on (_.userid === _.id) if (user.map(_.username) === username)
+    } yield (source)
+
+    dbConfig.db.run(query.result)
   }
 }

@@ -1,42 +1,122 @@
 <div class="page-header">
 	<h1>My Profile</h1>
 </div>
-<table class="key-value-table">
-	<tbody>
-		<tr>
-			<td>Username</td>
-			<td>{{profile.username}}</td>
-		</tr>
-		<tr>
-			<td>Name</td>
-			<td>{{profile.name}}</td>
-		</tr>
-		<tr>
-			<td>Email</td>
-			<td>{{profile.email}}</td>
-		</tr>
-		<tr>
-			<td>Password</td>
-			<td><button class="btn btn-default" data-toggle="modal" data-target="#passwordModal">Change</button></td>
-		</tr>
-	</tbody>
-</table>
+
+<div class="panel panel-primary">
+	<div class="panel-heading">Profile data</div>
+	<div class="panel-body">
+		<table class="key-value-table">
+			<tbody>
+				<tr>
+					<td>Username</td>
+					<td>{{profile.username}}</td>
+				</tr>
+				<tr>
+					<td>Name</td>
+					<td>{{profile.name}}</td>
+				</tr>
+				<tr>
+					<td>Email</td>
+					<td>{{profile.email}}</td>
+				</tr>
+				<tr>
+					<td>Password</td>
+					<td><button class="btn btn-default" data-toggle="modal" data-target="#passwordModal">Change</button></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
 
 <div>
 
 	<div class="panel panel-primary">
-		<div class="panel-heading">GDrive Integration</div>
+		<div class="panel-heading">Document Sources</div>
 		<div class="panel-body">
-			<div ng-switch="getGoogleAuthState()">
-				<div ng-switch-when="skipped" class="alert alert-success"><strong>Success.</strong> Authorization to Google Drive was already granted. Re-using existing token.</div>
-				<div ng-switch-when="success" class="alert alert-success"><strong>Success.</strong> Successfully authorized to access Google Drive account.</div>
-				<div ng-switch-when="revoked" class="alert alert-success"><strong>Revoked.</strong> Revoked authorization to access Google Drive account.</div>
-				<div ng-switch-when="error" class="alert alert-danger"><strong>Error.</strong> Access to Google Drive account not authorized.</div>
+			<div ng-repeat="source in sources">
+				<div ng-switch="source.type">
+					<div ng-switch-when="gdrive">
+						<h3>Fetch documents from Google Drive folder</h3>
+						<form role="form">
+							<div class="form-group">
+								<p>
+									The source folder on your GDrive will be monitored for changes. When a file is received, it is ingested into Themis and moved
+									to an archive folder on GDrive to prevent it from being ingested a second time. For this to work, you need to authorize us to access your
+									Google Drive account. Only one Google account can be linked to one Themis user.
+								</p>
+								<label for="gdriveSourceFolderId">Source folder ID</label>
+								<div class="input-group">
+									<span class="input-group-btn">
+										<button class="btn btn-default" type="button">
+											<span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+										</button>
+									</span>
+									<input type="text" class="form-control" id="gdriveSourceFolderId" ng-model="source.gdriveSourceFolderId">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="gdriveArchiveFolderId">Archivefolder ID</label>
+								<div class="input-group">
+									<span class="input-group-btn">
+										<button class="btn btn-default" type="button">
+											<span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+										</button>
+									</span>
+									<input type="text" class="form-control" id="gdriveArchiveFolderId" ng-model="source.gdriveArchiveFolderId">
+								</div>
+							</div>
+						</form>
+
+						<a class="btn btn-primary" role="button" href="{{googleOAuthURL}}">Authorize Google</a>
+						<a class="btn btn-danger" role="button" href="{{googleRevokeURL}}">Revoke authorization</a>
+						<div ng-switch="getGoogleAuthState()">
+							<div ng-switch-when="skipped" class="alert alert-success"><strong>Success.</strong> Authorization to Google Drive was already granted. Re-using existing token.</div>
+							<div ng-switch-when="success" class="alert alert-success"><strong>Success.</strong> Successfully authorized to access Google Drive account.</div>
+							<div ng-switch-when="revoked" class="alert alert-success"><strong>Revoked.</strong> Revoked authorization to access Google Drive account.</div>
+							<div ng-switch-when="error" class="alert alert-danger"><strong>Error.</strong> Access to Google Drive account not authorized.</div>
+						</div>
+
+					</div>
+					<div ng-switch-when="file">
+						<h3>Fetch documents from the file system</h3>
+						<p>The directory on the server's file system will be monitored for changes. When a file is received, it is ingested into Themis and moved
+							to its storage folder (and is consequently removed from the incoming folder).
+						<form role="form">
+							<div class="form-group">
+								<label for="fileSourceFolder">Source folder</label>
+								<div>
+									<input type="text" class="form-control" id="fileSourceFolder" ng-model="source.fileSourceFolder">
+								</div>
+							</div>
+						</form>
+					</div>
+					<div ng-switch-default>
+						<h3>Unknown source type</h3>
+						<pre>{{source}}</pre>
+					</div>
+				</div>
 			</div>
+			<h3>Add more document sources</h3>
+			<button class="btn btn-default" type="button">
+				<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+				Add GDrive source
+			</button>
+			<button class="btn btn-default" type="button">
+				<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+				Add file system source
+			</button>
 
-			<a class="btn btn-primary" role="button" href="{{googleOAuthURL}}">Authorize Google</a>
-			<a class="btn btn-primary" role="button" href="{{googleRevokeURL}}">Revoke authorization</a>
+			<button class="btn btn-primary pull-right" type="button">
+				<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+				Save configuration
+			</button>
 
+		</div>
+	</div>
+
+	<div class="panel panel-primary">
+		<div class="panel-heading">GDrive Integration (Testing)</div>
+		<div class="panel-body">
 			<div>
 				<h3>Contents of {{gdrive.folderName}}</h3>
 				<dms-loading-indicator loading="gdrive.loading"></dms-loading-indicator>

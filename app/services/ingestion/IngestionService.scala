@@ -20,7 +20,7 @@ class IngestionService @Inject() (val config: Configuration,
                                   val system: ActorSystem,
                                   @Named("ingestion-actor") val ingestionActor: ActorRef)(implicit ec: ExecutionContext) {
 
-  system.scheduler.schedule(0.microseconds, 5.seconds, ingestionActor, "run-ingestion")
+  system.scheduler.schedule(0.microseconds, 60.seconds, ingestionActor, "run-ingestion")
 }
 
 /**
