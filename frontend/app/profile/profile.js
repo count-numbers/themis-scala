@@ -9,7 +9,7 @@ angular.module('dms.profile', ['ngRoute'])
   });
 }])
 
-.controller('ProfileCtrl', function($scope, $rootScope, User, AuthenticationService, Configuration, DocumentSources, $location, GDrive, Errors) {
+.controller('ProfileCtrl', function($scope, $rootScope, User, AuthenticationService) {
 	$scope.profile = $rootScope.profile;
 	
 	$scope.oldPassword = "";
@@ -38,39 +38,4 @@ angular.module('dms.profile', ['ngRoute'])
 				}
 			);
 	}
-
-	$scope.googleOAuthURL  = Configuration.backendURL + "rest/v1/google/oauthstart"
-  	//$scope.googleTestURL   = Configuration.backendURL + "rest/v1/google/drive/list?id=1AhmeAXtkU2_B228e2CkXlIAOCjKBfEv5"
-  	$scope.googleRevokeURL = Configuration.backendURL + "rest/v1/google/oauthrevoke"
-
-    $scope.getGoogleAuthState = function() {
-        return $location.search().googleauth;
-    }
-
-    $scope.sources = DocumentSources.query();
-
-    $scope.gdrive = {
-        loading: true,
-        folderId: "root",
-        folderName: "Root",
-        folders: [],
-        setFolder: function(folder) {
-            console.log("Changing to folder: "+folder.id);
-            $scope.gdrive.loading = true;
-            $scope.gdrive.folderId = folder.id;
-            $scope.gdrive.folderName = folder.name;
-            $scope.gdrive.folders = GDrive.query({folderId:$scope.gdrive.folderId},
-            			function(data) { // success
-            			    $scope.gdrive.folders = $scope.gdrive.folders.filter(function(f) { return (f.mimeType == 'application/vnd.google-apps.folder') });
-            				$scope.gdrive.loading = false;
-            			},
-            			function($response) { // error
-            				Errors.add($response);
-            				$scope.gdrive.loading = false;
-            			}
-            );
-        }
-    }
-    $scope.gdrive.setFolder({id: "root", name:"Root"});
-
 });

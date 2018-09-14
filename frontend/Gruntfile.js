@@ -46,6 +46,7 @@ module.exports = function(grunt) {
      		      'app/contact/contact.js',
      		      'app/contact/contact-search.js',
      		      'app/profile/profile.js',
+     		      'app/sources/sources.js',
      		      'app/login/login.js',
      		      'app/admin/admin.js',
      		      'app/components/auth.js',
@@ -131,6 +132,7 @@ module.exports = function(grunt) {
 	    	      'home/*.html',
 	    	      'login/*.html',
 	    	      'profile/*.html',
+	    	      'sources/*.html',
 	    	      'components/**/*.html',
 	    	      'static/**/*',
 	    	     ],
@@ -156,6 +158,7 @@ module.exports = function(grunt) {
 			      '../src/main/webapp/home',
 			      '../src/main/webapp/login',
 			      '../src/main/webapp/profile',
+			      '../src/main/webapp/sources',
 			      '../src/main/webapp/components',
 			      '../src/main/webapp/static'
 			      ] 

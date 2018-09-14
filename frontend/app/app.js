@@ -16,6 +16,7 @@ angular.module('dms', [
   'dms.contactSearch',
   'dms.login',
   'dms.profile',
+  'dms.sources',
   'dms.admin',
   'dms.trello',
   'dms.auth',

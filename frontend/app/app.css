@@ -151,3 +151,11 @@ body {
 .bs-callout h4:first-child {
     margin-top:0ex;
 }
+
+.panel-body.striped .striped-container:nth-child(odd) {
+    background:#dddddd;
+}
+
+.clickable-icon {
+    cursor:pointer;
+}

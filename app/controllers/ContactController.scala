@@ -38,7 +38,7 @@ class ContactController @Inject()(val config: Configuration,
       val newContact = request.body.as[Contact]
       contactRepository
         .saveNew(newContact)
-        .map((c: Contact) => Ok(Json.toJson(c)).withHeaders("Location" -> getURI(c.id.getOrElse(0))))
+        .map((c: Contact) => Created(Json.toJson(c)).withHeaders("Location" -> getURI(c.id.getOrElse(0))))
     }
   }
 

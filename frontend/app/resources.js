@@ -60,9 +60,12 @@ dmsServices.factory('ServerConfiguration', ['$resource','Configuration', functio
 }]);
 
 
-dmsServices.factory('DocumentSources', ['$resource','Configuration', function($resource, Configuration){
-    return $resource(Configuration.backendURL + 'rest/v1/sources', {}, {});
-}]);
+dmsServices.factory('DocumentSources', ['$resource','Configuration',
+  function($resource, Configuration){
+    return $resource(Configuration.backendURL + 'rest/v1/source/:sourceId', {sourceId:'@id'}, {
+      query: {method:'GET', params:{}, isArray:true, url:Configuration.backendURL + 'rest/v1/sources'}
+    });
+  }]);
 
 
 dmsServices.factory('GDrive', ['$resource', 'Configuration',

@@ -34,7 +34,7 @@ GET     /documents                              controllers.DocumentController.s
 GET     /attachment/:id/body                    controllers.AttachmentController.download(id: Int)
 GET     /attachment/:id/thumbnail               controllers.AttachmentController.thumbnail(id: Int)
 
-# Contactsff
+# Contacts
 GET     /contact/:id/documents                  controllers.ContactController.getDocumentsForContact(id: Int, offset: Option[Int], limit: Option[Int])
 GET     /contact/:id                            controllers.ContactController.getById(id: Int)
 POST    /contact/:id                            controllers.ContactController.update(id: Int)
@@ -49,6 +49,10 @@ GET     /tags                                   controllers.TagController.search
 
 # Source configurations
 GET     /sources                                controllers.SourceController.getMine()
+POST    /source                                 controllers.SourceController.create()
+GET     /source/:id                             controllers.SourceController.get(id: Int)
+POST    /source/:id                             controllers.SourceController.update(id: Int)
+DELETE  /source/:id                             controllers.SourceController.delete(id: Int)
 
 # Google OAuth flow
 GET     /google/oauthstart                      controllers.google.OAuthController.oauthStart()
