@@ -57,6 +57,6 @@ angular.module('dms.sources', ['ngRoute'])
             );
         }
     }
-   // $scope.gdrive.setFolder({id: "root", name:"Root"});
+   $scope.gdrive.setFolder({id: "root", name:"Root"});
 
 });

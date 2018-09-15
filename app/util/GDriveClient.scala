@@ -2,15 +2,15 @@ package util
 
 import java.util
 import java.util.Collections
-import javax.inject.{Inject, Singleton}
 
+import javax.inject.{Inject, Singleton}
 import com.google.api.client.auth.oauth2.{Credential, StoredCredential, TokenResponse}
 import com.google.api.client.googleapis.auth.oauth2.{GoogleAuthorizationCodeFlow, GoogleAuthorizationCodeRequestUrl, GoogleAuthorizationCodeTokenRequest, GoogleTokenResponse}
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.store.{AbstractDataStore, AbstractDataStoreFactory, MemoryDataStoreFactory}
-import com.google.api.services.drive.model.{ChildList, ChildReference, File}
+import com.google.api.services.drive.model.{ChildList, ChildReference, File, FileList}
 import com.google.api.services.drive.{Drive, DriveScopes}
 import db.ConfigRepository
 import play.api.Logger
@@ -131,13 +131,16 @@ case class GDriveClient(user: String, clientId: String, clientSecret: String, va
   def listFolder(folderId: Option[String]): Future[Seq[GDriveFile]] = {
     import collection.JavaConverters._
     Future {
-      val rawChildren: ChildList = drive.children().list(folderId.getOrElse("root")).execute()
+      val id = folderId.getOrElse("root");
+      val q = s"\'${id}\' in parents";
+      Logger.debug(s"GDrive query: ${q}.")
+      //.setFields("items(id,title,mimeType,fileSize,selfLink,embedLink,downloadUrl)").
+      val children: FileList = drive.files().list().setQ(q).execute()
       for {
-        child <- rawChildren.getItems.asScala
+        child: File <- children.getItems().asScala
       } yield {
-        val f: File = drive.files().get(child.getId).setFields("id,title,mimeType,fileSize,selfLink,embedLink,downloadUrl")execute()
-        Logger.debug(s"Found file: ${f}")
-        GDriveFile.of(f)
+        Logger.debug(s"Found file: ${child}")
+        GDriveFile.of(child)
       }
     }
   }
