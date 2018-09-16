@@ -1,22 +1,39 @@
-<div class="panel panel-primary">
-    <div class="panel-body">
-        <div>
-            <h3>
-                <a class="btn btn-default btn-sm" type="button" ng-click="home()"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
-                {{folderName}}
-                <small>{{selectedFolderId}}</small>
-            </h3>
+<div class="form-group">
+    <label for="gdriveSourceFolderId">{{label}}</label>
+    <div class="input-group">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="button" ng-click="toggle()">
+                <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+            </button>
+        </span>
+        <input type="text" class="form-control" id="gdriveSourceFolderId" ng-model="folderId">
+    </div>
 
-            <dms-loading-indicator loading="loading"></dms-loading-indicator>
-            <div ng-show="!folders.length">(no subfolders here)</div>
-            <ul class="list-group fixed-panel">
-                <li ng-repeat="file in folders" ng-click="setFolder(file)" class="list-group-item">{{file.name}}</li>
-            </ul>
+    <div ng-if="visible" class="slide-in">
+        <div class="panel panel-primary">
+            <div class="panel-body">
+                <div>
+                    <h3>
+                        <a class="btn btn-default btn-sm" type="button" ng-click="home()"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
+                        {{folderName}}
+                        <small>{{selectedFolderId}}</small>
+                    </h3>
+
+                    <ul class="list-group fixed-panel">
+                        <li ng-show="loading" class="list-group-item">
+                            <span class="ajax-indicator">
+                                <img src="static/img/ajax-load-100.gif" width="16" height="16"/>
+                            </span>
+                        </li>
+                        <li ng-show="!folders.length && !loading" class="list-group-item">(no subfolders here)</li>
+                        <li ng-repeat="file in folders" ng-click="setFolder(file)" class="list-group-item">{{file.name}}</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <a class="btn btn-primary" type="button" ng-click="submit()">Select</a>
+                </div>
+            </div>
         </div>
-
-        <div>
-            <a class="btn btn-primary" type="button" ng-click="submit()">Select</a>
-        </div>
-
     </div>
 </div>

@@ -7,9 +7,11 @@ angular.module('dms.gdrive', [])
         templateUrl: 'components/util/gdrive-file-selector.html',
         restrict: 'E',
         scope: {
-              folderId: '=folder'
+              folderId: '=folder',
+              label: '='
         },
         controller: function($scope, GDrive, Errors) {
+            $scope.visible = false;
             $scope.folderName = "[unknown]";
             $scope.folders = [];
             $scope.setFolder = function(folder) {
@@ -36,13 +38,19 @@ angular.module('dms.gdrive', [])
                             }
                 );
             };
+            $scope.toggle = function() {
+                $scope.visible = !$scope.visible;
+                if ($scope.visible) {
+                    $scope.loadChildren();
+                }
+            };
             $scope.submit = function() {
                 console.log("Submitting: " + $scope.folderId);
                 $scope.folderId = $scope.selectedFolderId;
+                $scope.visible = false;
             };
 
             $scope.selectedFolderId = $scope.folderId;
-            $scope.loadChildren();
 
             console.log("Folder is "+$scope.folderId);
         }

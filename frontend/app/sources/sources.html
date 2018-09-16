@@ -14,36 +14,14 @@
 			</div>
 			<div class="panel-body">
 				<form role="form">
-					<div class="form-group">
-						<p>
+					<p>
 							The source folder on your GDrive will be monitored for changes. When a file is received, it is ingested into Themis and moved
 							to an archive folder on GDrive to prevent it from being ingested a second time. For this to work, you need to authorize us to access your
 							Google Drive account. Only one Google account can be linked to one Themis user.
-						</p>
-						<label for="gdriveSourceFolderId">Source folder ID</label>
-						<div class="input-group">
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button">
-									<span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-								</button>
-							</span>
-							<input type="text" class="form-control" id="gdriveSourceFolderId" ng-model="source.gdriveSourceFolderId">
-						</div>
+					</p>
 
-						<gdrive-fileselector folder="source.gdriveSourceFolderId"></gdrive-fileselector>
-
-					</div>
-					<div class="form-group">
-						<label for="gdriveArchiveFolderId">Archivefolder ID</label>
-						<div class="input-group">
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button">
-									<span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-								</button>
-							</span>
-							<input type="text" class="form-control" id="gdriveArchiveFolderId" ng-model="source.gdriveArchiveFolderId">
-						</div>
-					</div>
+					<gdrive-fileselector folder="source.gdriveSourceFolderId" label="'Source folder'"></gdrive-fileselector>
+					<gdrive-fileselector folder="source.gdriveArchiveFolderId" label="'Archive folder'"></gdrive-fileselector>
 				</form>
 
 				<a class="btn btn-primary" role="button" href="{{googleOAuthURL}}">Authorize Google</a>

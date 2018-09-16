@@ -165,3 +165,31 @@ body {
   max-height: 200px;
   overflow-y: scroll;
 }
+
+
+/* The starting CSS styles for the enter animation */
+.slide-in.ng-enter {
+  transition-duration:0.5s;
+  transition-timing-function: linear;
+  transition-property: all;
+  max-height:0px;
+  overflow:hidden
+}
+
+/* The finishing CSS styles for the enter animation */
+.slide-in.ng-enter.ng-enter-active {
+  max-height:320px;
+}
+
+.slide-in.ng-leave {
+  transition-duration:0.5s;
+  transition-timing-function: linear;
+  transition-property: all;
+  max-height:320px;
+  overflow:hidden
+}
+
+/* The finishing CSS styles for the enter animation */
+.slide-in.ng-leave.ng-leave-active {
+  max-height:0px;
+}
