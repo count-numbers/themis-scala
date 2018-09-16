@@ -19,6 +19,7 @@ angular.module('dms', [
   'dms.sources',
   'dms.admin',
   'dms.trello',
+  'dms.gdrive',
   'dms.auth',
   'dms.resources',
   'dms.dmsDomain',

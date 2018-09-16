@@ -27,36 +27,11 @@ angular.module('dms.sources', ['ngRoute'])
         $scope.sources.push({type:"file"});
     }
     $scope.addGDriveSource = function() {
-        $scope.sources.push({type:"gdrive"});
+        $scope.sources.push({type:"gdrive", gdriveSourceFolderId: "root", gdriveArchiveFolderId: "root"});
     }
     $scope.save = function() {
         $scope.sources.forEach(function(src) {
             DocumentSources.save(src);
         });
     }
-
-    $scope.gdrive = {
-        loading: true,
-        folderId: "root",
-        folderName: "Root",
-        folders: [],
-        setFolder: function(folder) {
-            console.log("Changing to folder: "+folder.id);
-            $scope.gdrive.loading = true;
-            $scope.gdrive.folderId = folder.id;
-            $scope.gdrive.folderName = folder.name;
-            $scope.gdrive.folders = GDrive.query({folderId:$scope.gdrive.folderId},
-            			function(data) { // success
-            			    $scope.gdrive.folders = $scope.gdrive.folders.filter(function(f) { return (f.mimeType == 'application/vnd.google-apps.folder') });
-            				$scope.gdrive.loading = false;
-            			},
-            			function($response) { // error
-            				Errors.add($response);
-            				$scope.gdrive.loading = false;
-            			}
-            );
-        }
-    }
-   $scope.gdrive.setFolder({id: "root", name:"Root"});
-
 });

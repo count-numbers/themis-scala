@@ -1,0 +1,22 @@
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <div>
+            <h3>
+                <a class="btn btn-default btn-sm" type="button" ng-click="home()"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
+                {{folderName}}
+                <small>{{selectedFolderId}}</small>
+            </h3>
+
+            <dms-loading-indicator loading="loading"></dms-loading-indicator>
+            <div ng-show="!folders.length">(no subfolders here)</div>
+            <ul class="list-group fixed-panel">
+                <li ng-repeat="file in folders" ng-click="setFolder(file)" class="list-group-item">{{file.name}}</li>
+            </ul>
+        </div>
+
+        <div>
+            <a class="btn btn-primary" type="button" ng-click="submit()">Select</a>
+        </div>
+
+    </div>
+</div>

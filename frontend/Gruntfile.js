@@ -52,7 +52,8 @@ module.exports = function(grunt) {
      		      'app/components/auth.js',
      		      'app/components/domain/domain.js',
      		      'app/components/domain/editable-markup.js',
-     		      'app/components/trello/trello.js'
+     		      'app/components/util/trello.js',
+     		      'app/components/util/gdrive.js'
     		],
     		dest: '../src/main/webapp/<%= pkg.name %>.js'
     	},
