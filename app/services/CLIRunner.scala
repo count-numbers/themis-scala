@@ -27,6 +27,14 @@ class CLIRunner @Inject() (config: Configuration) {
   val workingDirectory = new File(config.getString("working-dir", None).getOrElse("."))
 
 
+  def readFromPipeStdoutAsText(command1: Seq[String], command2: Seq[String]): String = {
+    Logger.info(s"Running command ${command1} | ${command2}")
+    val p1 =   Process(command = command1, cwd = workingDirectory)
+    val p2 =   Process(command = command2, cwd = workingDirectory)
+    val stdout: String = (p1 #| p2 !!)
+    return stdout
+  }
+
   /** Starts the given command and reads the output as text. */
   def readStdoutAsText(command: Seq[String]): String = {
     Logger.info(s"Running command ${command}")

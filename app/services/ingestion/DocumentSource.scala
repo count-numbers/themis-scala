@@ -48,7 +48,9 @@ abstract class DocumentSource[T](val sourceId: String,
       val description: Option[String] = for {
         contentExtractor <- contentExtractorService.forMimetype(mimeType)
       } yield {
-        contentExtractor.extractContent(file)
+        val txt = contentExtractor.extractContent(file)
+        Logger.debug(s"Extracted ${txt.length} characters from ${file} (${mimeType}).")
+        txt
       }
       Logger.debug(s"Extracted ${description.map(_.length)} bytes of content.")
       for {

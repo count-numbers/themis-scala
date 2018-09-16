@@ -28,9 +28,9 @@ class CLIContentExtractor(val cLIRunner: CLIRunner) extends ContentExtractor {
   def getCompatibleMimeTypes: Array[String] = COMPATIBLE_CONTENT_TYPES
 
   override def extractContent(srcPath: Path): String = {
-    // TODO: This will miserably fail if script is not in expected position relative to working dir.
-    // How do we best package this?
-    cLIRunner.readStdoutAsText(Seq("app/services/contentextraction/ocr.sh", srcPath.toString))
+    cLIRunner.readFromPipeStdoutAsText(
+      Seq("convert", "-density", "300", srcPath.toString, "png:-"),
+      Seq("tesseract", "stdin", "stdout", "-l", "deu")
+    )
   }
 }
-

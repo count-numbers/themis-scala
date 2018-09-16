@@ -222,7 +222,7 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
     // cause an SQL type error since Strings do not match to Postgres tsvectors. fulltext is populated
     // via a DB trigger
     val action = (Tables.Document.map(dr => (dr.name, dr.description, dr.sourceid, dr.sourcereference, dr.owner, dr.archivingcomplete, dr.actionrequired, dr.archivetimestamp, dr.modificationtimestamp))
-      returning Tables.Document.map(_.id)) += (name, description, sourceId, sourceReference, ownerId, false, false, now, now)
+      returning Tables.Document.map(_.id)) += (name, description.map(_.replaceAll("\u0000", "")), sourceId, sourceReference, ownerId, false, false, now, now)
 
     val f: Future[Int] = dbConfig.db.run(action)
     f.onSuccess({ case id: Int => Logger.info(s"Inserted document with id ${id}")})

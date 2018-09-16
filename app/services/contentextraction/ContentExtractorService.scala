@@ -15,6 +15,6 @@ class ContentExtractorService @Inject() (val cliRunner: CLIRunner) {
   private val extractors = Seq(new TesseractContentExtractor(cliRunner), new PlainTextContentExtractor, new CLIContentExtractor(cliRunner))
 
   def forMimetype(mimeType: String): Option[ContentExtractor] = {
-    extractors.find (_.getCompatibleMimeTypes.contains(mimeType))
+    extractors.find(_.getCompatibleMimeTypes.contains(mimeType))
   }
 }
