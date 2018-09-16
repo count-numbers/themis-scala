@@ -12,7 +12,7 @@ import services.thumbnail.ThumbnailExtractor
 @Singleton
 class ContentExtractorService @Inject() (val cliRunner: CLIRunner) {
 
-  private val extractors = Seq(new OCRContentExtractor(cliRunner), new PlainTextContentExtractor)
+  private val extractors = Seq(new TesseractContentExtractor(cliRunner), new PlainTextContentExtractor, new CLIContentExtractor(cliRunner))
 
   def forMimetype(mimeType: String): Option[ContentExtractor] = {
     extractors.find (_.getCompatibleMimeTypes.contains(mimeType))
