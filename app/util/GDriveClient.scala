@@ -1,22 +1,20 @@
 package util
 
-import java.util
 import java.util.Collections
 
-import javax.inject.{Inject, Singleton}
-import com.google.api.client.auth.oauth2.{Credential, StoredCredential, TokenResponse}
-import com.google.api.client.googleapis.auth.oauth2.{GoogleAuthorizationCodeFlow, GoogleAuthorizationCodeRequestUrl, GoogleAuthorizationCodeTokenRequest, GoogleTokenResponse}
+import com.google.api.client.auth.oauth2.StoredCredential
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
-import com.google.api.client.util.store.{AbstractDataStore, AbstractDataStoreFactory, MemoryDataStoreFactory}
-import com.google.api.services.drive.model.{ChildList, ChildReference, File, FileList}
+import com.google.api.client.util.store.{AbstractDataStore, AbstractDataStoreFactory}
+import com.google.api.services.drive.model.{File, FileList}
 import com.google.api.services.drive.{Drive, DriveScopes}
 import db.ConfigRepository
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.libs.json.Json
 
-import scala.collection.mutable
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
@@ -116,32 +114,34 @@ case class GDriveClient(user: String, clientId: String, clientSecret: String, va
     .build()
 
 
-  lazy val drive: Drive = {
+  lazy val driveTry: Try[Drive] = {
     val credentialOpt = Option(authCodeFlow.loadCredential(user))
     credentialOpt match {
       case None => {
-        throw new IllegalStateException("Not yet authorized with Google.")
+        Failure(new IllegalStateException("Not yet authorized with Google."))
       }
       case Some(credential) =>
         val httpTransport = GoogleNetHttpTransport.newTrustedTransport
-        new Drive.Builder(httpTransport, JacksonFactory.getDefaultInstance(), credential).setApplicationName("themis-server").build()
+        Success(new Drive.Builder(httpTransport, JacksonFactory.getDefaultInstance(), credential).setApplicationName("themis-server").build())
     }
   }
 
-  def listFolder(folderId: Option[String]): Future[Seq[GDriveFile]] = {
+  def listFolder(folderId: Option[String]): Try[Seq[GDriveFile]] = {
     import collection.JavaConverters._
-    Future {
-      val id = folderId.getOrElse("root");
-      val q = s"\'${id}\' in parents";
-      Logger.debug(s"GDrive query: ${q}.")
-      //.setFields("items(id,title,mimeType,fileSize,selfLink,embedLink,downloadUrl)").
-      val children: FileList = drive.files().list().setQ(q).execute()
-      for {
-        child: File <- children.getItems().asScala
-      } yield {
-        Logger.debug(s"Found file: ${child}")
-        GDriveFile.of(child)
+    val id = folderId.getOrElse("root");
+    val q = s"\'${id}\' in parents";
+    Logger.debug(s"GDrive query: ${q}.")
+    driveTry match {
+      case Success(drive: Drive) => {
+        val children: FileList = drive.files().list().setQ(q).execute()
+        Success(for {
+          child: File <- children.getItems().asScala
+        } yield {
+          Logger.debug(s"Found file: ${child}")
+          GDriveFile.of(child)
+        })
       }
+      case Failure(ex) => Failure(ex)
     }
   }
 }

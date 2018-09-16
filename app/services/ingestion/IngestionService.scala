@@ -1,8 +1,8 @@
 package services.ingestion
 
 import java.nio.file.Paths
-import javax.inject.{Named, Singleton}
 
+import javax.inject.{Named, Singleton}
 import actions.DocumentActions
 import akka.actor.{Actor, ActorRef, ActorSystem}
 import com.google.inject.Inject
@@ -14,6 +14,7 @@ import util.GDriveClientFactory
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
+import scala.util.{Failure, Try}
 
 @Singleton
 class IngestionService @Inject() (val config: Configuration,
@@ -36,21 +37,21 @@ class IngestionServiceActor @Inject() (val config: Configuration, val ingestionN
 
   override def receive: Receive = {
     case msg: String => {
-      Logger.info(s"Running ingestion service: ${msg}")
+      Logger.debug(s"Running ingestion service: ${msg}")
 
       for {
-        sources: Seq[(Tables.SourceRow, Option[Tables.UserRow])] <- sourceRepository.getAll()
+        sources: Seq[(Tables.SourceRow, Option[Tables.UserRow])] <- sourceRepository.getAllActive()
         sourceAndUser: (Tables.SourceRow, Option[Tables.UserRow]) <- sources
       } {
-        Logger.debug(s"Found document source configuration: ${sourceAndUser}")
+        Logger.debug(s"Found active document source configuration: ${sourceAndUser}")
 
         val source: Option[DocumentSource[_]] = sourceAndUser match {
-          case (Tables.SourceRow(_, "gdrive", _, Some(gdriveSourceFolder: String), Some(gdriveArchiveFolder: String), _),
+          case (Tables.SourceRow(_, "gdrive", _, _, Some(gdriveSourceFolder: String), Some(gdriveArchiveFolder: String), _),
             Some(Tables.UserRow(_, username: String, _, _, _)))
           => Some(new GDriveSource(username, gdriveSourceFolder, gdriveArchiveFolder,
               gDriveClientFactory.build(username), config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext))
 
-          case (Tables.SourceRow(_, "file", _, _, _, Some(fileSourceFolder: String)),
+          case (Tables.SourceRow(_, "file", _, _, _, _, Some(fileSourceFolder: String)),
             Some(Tables.UserRow(_, username: String, _, _, _)))
           =>
             Some(new FileSource(username, Paths.get(fileSourceFolder), config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext))
@@ -60,8 +61,18 @@ class IngestionServiceActor @Inject() (val config: Configuration, val ingestionN
 
 
         source.foreach(source => {
-          Logger.info(s"Executing document source ${source.sourceId} for user ${source.username}.")
-          source.run
+          Logger.debug(s"Executing document source ${source.sourceId} for user ${source.username}.")
+          var srcId = sourceAndUser._1.id;
+          source.run match {
+            case Failure(ex) => {
+              Logger.warn(s"Document source ${srcId } failed: ${ex}", ex)
+              sourceRepository.deactivate(sourceAndUser._1.id)
+                .onSuccess({case _ => Logger.info(s"Deactivated source ${srcId }")})
+            }
+            case _ => {
+              Logger.debug(s"Document source ${srcId } completed.")
+            }
+          }
         })
       }
     }

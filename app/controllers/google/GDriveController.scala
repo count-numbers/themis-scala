@@ -1,15 +1,15 @@
 package controllers.google
 
-import javax.inject.{Inject, Singleton}
-
 import auth.AuthAction
 import db.ConfigRepository
+import javax.inject.{Inject, Singleton}
+import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc._
-import play.api.{Configuration}
-import util.{GDriveClient, GDriveClientFactory}
+import util.{GDriveClient, GDriveClientFactory, GDriveFile}
 
-import scala.concurrent.{ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class GDriveController @Inject()(val config: Configuration, val configRepo: ConfigRepository,
@@ -18,11 +18,15 @@ class GDriveController @Inject()(val config: Configuration, val configRepo: Conf
 
   def listFolder(id: String) = AuthAction().async {
        implicit req => {
-         val gdrive: GDriveClient = gDriveClientFactory.build(req.username)
-         gdrive
-           .listFolder(Some(id))
-           .map(f => Ok(Json.toJson(f)))
-           .recover{case ex: IllegalStateException => BadRequest(ex.getMessage)}
+         Future {
+           val gdrive: GDriveClient = gDriveClientFactory.build(req.username)
+           val filesTry: Try[Seq[GDriveFile]] = gdrive.listFolder(Some(id))
+           filesTry match {
+             case Success(files) => Ok(Json.toJson(files))
+             case Failure(ex: IllegalStateException) => BadRequest(ex.getMessage)
+             case Failure(ex) => InternalServerError(ex.getMessage)
+           }
+         }
        }
      }
 }

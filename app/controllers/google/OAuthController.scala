@@ -31,7 +31,7 @@ class OAuthController @Inject()(val config: Configuration, val configRepo: Confi
           }
         case Some(credentials) => {
           config.getString("themis.frontend.url") match {
-            case Some(url: String) => Redirect(url + "#/profile?googleauth=skipped")
+            case Some(url: String) => Redirect(url + "#/sources?googleauth=skipped")
             case None => Ok("Frontend URL not configured.")
           }
         }
@@ -46,7 +46,7 @@ class OAuthController @Inject()(val config: Configuration, val configRepo: Confi
       val gdrive: GDriveClient = gDriveClientFactory.build(req.username)
       gdrive.authCodeFlow.getCredentialDataStore.delete(req.username)
       val result = config.getString("themis.frontend.url") match {
-        case Some(url: String) => Redirect(url + "#/profile?googleauth=revoked")
+        case Some(url: String) => Redirect(url + "#/sources?googleauth=revoked")
         case None => Ok("Frontend URL not configured.")
       }
       Future(result)
@@ -66,7 +66,7 @@ class OAuthController @Inject()(val config: Configuration, val configRepo: Confi
       Logger.info(s"Stored credential: ${credential}.")
 
       val result = config.getString("themis.frontend.url") match {
-        case Some(url: String) => Redirect(url + "#/profile?googleauth=success")
+        case Some(url: String) => Redirect(url + "#/sources?googleauth=success")
         case None => Ok("Frontend URL not configured.")
       }
       Future(result)

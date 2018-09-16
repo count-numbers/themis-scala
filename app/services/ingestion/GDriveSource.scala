@@ -9,8 +9,8 @@ import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
 import util.{GDriveClient, GDriveFile}
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success, Try}
 
 class GDriveSource(username: String,
                    sourceFolderID: String,
@@ -26,23 +26,31 @@ class GDriveSource(username: String,
   extends DocumentSource[GDriveFile]("gdrive", username, config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext) {
 
 
-  override def findDocuments: Seq[(String, String, GDriveFile)] = {
-    val f: Future[Seq[GDriveFile]] = gdrive.listFolder(Some(sourceFolderID))
-    Await.ready(f, Duration.Inf).value.get.get.map(file => (file.name, file.embedLink, file))
+  override def findDocuments: Try[Seq[(String, String, GDriveFile)]] = {
+    val filesTry: Try[Seq[GDriveFile]] =  gdrive.listFolder(Some(sourceFolderID))
+    filesTry.map(files => {
+      val docs = for {
+        file: GDriveFile <- files
+      } yield {
+        (file.name, file.embedLink, file)
+      }
+      docs
+    })
   }
 
-  override def importToTemp(file: GDriveFile) = {
+  override def importToTemp(file: GDriveFile): Try[Path] = {
     Logger.info(s"Downloading gdrive file ${file.id} to ${tempDir}.")
     val dest: Path = tempDir.resolve(file.name)
     val out: OutputStream = new FileOutputStream(dest.toFile)
-    gdrive.drive.files().get(file.id).executeMediaAndDownloadTo(out)
-
-    Logger.debug(s"Moving gdrive file ${file.id} from ${sourceFolderID} to ${archiveFolderID}.")
-    gdrive.drive.files().update(file.id, null)
-      .setAddParents(archiveFolderID)
-      .setRemoveParents(sourceFolderID)
-      .setFields("id, parents")
-      .execute()
-    dest
+    gdrive.driveTry.map(drive => {
+      drive.files().get(file.id).executeMediaAndDownloadTo(out)
+      Logger.debug(s"Moving gdrive file ${file.id} from ${sourceFolderID} to ${archiveFolderID}.")
+      drive.files().update(file.id, null)
+        .setAddParents(archiveFolderID)
+        .setRemoveParents(sourceFolderID)
+        .setFields("id, parents")
+        .execute()
+      dest
+    })
   }
 }

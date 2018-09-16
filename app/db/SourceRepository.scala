@@ -33,6 +33,18 @@ class SourceRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider, i
       .run(q.result)
   }
 
+  def getAllActive(): Future[Seq[(Tables.SourceRow, Option[Tables.UserRow])]] = {
+    val q = Tables.Source joinLeft Tables.User on (_.userid === _.id) filter (_._1.active) sortBy (_._1.id asc)
+    dbConfig.db
+      .run(q.result)
+  }
+
+  def deactivate(id: Int): Future[Boolean] = {
+    val updateAction = Tables.Source.filter(_.id === id).map(_.active).update(false)
+    dbConfig.db.run(updateAction).map(_ == 1)
+
+  }
+
   def getAllForUser(username: String): Future[Seq[_root_.db.Tables.SourceRow]] = {
     val query = for {
       (source, user) <- db.Tables.Source joinLeft db.Tables.User on (_.userid === _.id) if (user.map(_.username) === username)
@@ -83,6 +95,7 @@ class SourceRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider, i
     id = source.id.getOrElse(-1),
     `type` = source.`type`,
     userid =  userId,
+    active = source.active,
     filesourcefolder = source.fileSourceFolder,
     gdrivesourcefolder = source.gdriveSourceFolderId,
     gdrivearchivefolder = source.gdriveArchiveFolderId

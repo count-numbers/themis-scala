@@ -8,6 +8,7 @@ import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
 
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success, Try}
 
 /** Abstract superclass of active document sources.
   * The document source is invoked at intervals, importing documents in batches.
@@ -31,48 +32,53 @@ abstract class DocumentSource[T](val sourceId: String,
   val tempDir: Path = Paths.get(config.getString("themis.temp.dir").get)
 
 
-  def findDocuments: Seq[(String,String,T)]
+  def findDocuments: Try[Seq[(String, String, T)]]
 
-  def importToTemp(t: T): Path
+  def importToTemp(t: T): Try[Path]
 
-  def run() = {
-    val found: Seq[(String, String, T)] = findDocuments
-    Logger.debug(s"Found ${found.length} new docs for ${sourceId}.")
-    for ((name: String, sourceRef: String, input: T) <- found) {
-      val file: Path = importToTemp(input)
+  def run(): Try[Unit] = {
+    val foundTry: Try[Seq[(String, String, T)]] = findDocuments
 
-      Logger.info(s"Received incoming file ${file}.")
+    foundTry.map((found: Seq[(String, String, T)]) => {
+      Logger.debug(s"Found ${found.length} new docs for ${sourceId}.")
+      for ((name: String, sourceRef: String, input: T) <- found) {
+        val fileTry: Try[Path] = importToTemp(input)
 
-      val size = Files.size(file)
-      val mimeType = Files.probeContentType(file)
-      val description: Option[String] = for {
-        contentExtractor <- contentExtractorService.forMimetype(mimeType)
-      } yield {
-        val txt = contentExtractor.extractContent(file)
-        Logger.debug(s"Extracted ${txt.length} characters from ${file} (${mimeType}).")
-        txt
-      }
-      Logger.debug(s"Extracted ${description.map(_.length)} bytes of content.")
-      for {
-        docId: Int <- documentActions.createNew(name = name,
-          description = description,
-          ownerUsername = username,
-          sourceId = sourceId,
-          sourceReference = sourceRef)
-        attachmentId: Option[Int] <- documentActions.addAttachment(docId = docId, name = name, size = size, mimeType = mimeType, username = username)
-      } yield {
-        Logger.debug(s"Assigned new document ID ${docId}, attachment ${attachmentId}.")
-        // if we are successful creating the document in the DB, move files around and extract thumbnail
-        for (id <- attachmentId) {
-          val dest = destinationDir.resolve(s"${id}.attachment")
-          Files.move(file, dest)
-          Logger.info(s"Ingested ${file} to ${dest}.")
-          for (thumbnailExtractor <- thumbnailService.forMimetype(mimeType)) {
-            thumbnailExtractor.extractFromFile(dest, destinationDir.resolve(s"${id}.thumb"))
+        fileTry.map((file:Path) => {
+          Logger.info(s"Received incoming file ${file}.")
+
+          val size = Files.size(file)
+          val mimeType = Files.probeContentType(file)
+          val description: Option[String] = for {
+            contentExtractor <- contentExtractorService.forMimetype(mimeType)
+          } yield {
+            val txt = contentExtractor.extractContent(file)
+            Logger.debug(s"Extracted ${txt.length} characters from ${file} (${mimeType}).")
+            txt
           }
-        }
-        //ingestionNotifier.notify(docId)
+          Logger.debug(s"Extracted ${description.map(_.length)} bytes of content.")
+          for {
+            docId: Int <- documentActions.createNew(name = name,
+              description = description,
+              ownerUsername = username,
+              sourceId = sourceId,
+              sourceReference = sourceRef)
+            attachmentId: Option[Int] <- documentActions.addAttachment(docId = docId, name = name, size = size, mimeType = mimeType, username = username)
+          } yield {
+            Logger.debug(s"Assigned new document ID ${docId}, attachment ${attachmentId}.")
+            // if we are successful creating the document in the DB, move files around and extract thumbnail
+            for (id <- attachmentId) {
+              val dest = destinationDir.resolve(s"${id}.attachment")
+              Files.move(file, dest)
+              Logger.info(s"Ingested ${file} to ${dest}.")
+              for (thumbnailExtractor <- thumbnailService.forMimetype(mimeType)) {
+                thumbnailExtractor.extractFromFile(dest, destinationDir.resolve(s"${id}.thumb"))
+              }
+            }
+            //ingestionNotifier.notify(docId)
+          }
+        })
       }
-    }
+    })
   }
 }

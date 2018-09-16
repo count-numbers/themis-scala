@@ -103,6 +103,7 @@ CREATE TABLE config (
 CREATE TABLE source (
     id SERIAL PRIMARY KEY,
     type VARCHAR NOT NULL,
+    active BOOLEAN NOT NULL,
     "userId" INT REFERENCES "user"(id) NOT NULL,
     "gdriveSourceFolder" VARCHAR,
     "gdriveArchiveFolder" VARCHAR,
