@@ -61,8 +61,8 @@ class IngestionServiceActor @Inject() (val config: Configuration, val ingestionN
 
 
         source.foreach(source => {
-          Logger.debug(s"Executing document source ${source.sourceId} for user ${source.username}.")
           var srcId = sourceAndUser._1.id;
+          Logger.debug(s"Executing document source ${srcId} of type ${source.sourceId} for user ${source.username}.")
           source.run match {
             case Failure(ex) => {
               Logger.warn(s"Document source ${srcId } failed: ${ex}", ex)
