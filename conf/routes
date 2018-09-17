@@ -3,62 +3,63 @@
 # ~~~~
 
 # all methods for all paths
-OPTIONS /                           controllers.OptionsController.rootOptions
-OPTIONS /*url                       controllers.OptionsController.options(url: String)
+OPTIONS /rest/v1/                           controllers.OptionsController.rootOptions
+OPTIONS /rest/v1/*url                       controllers.OptionsController.options(url: String)
 
-POST    /login                      controllers.LoginController.login
+POST    /rest/v1/login                      controllers.LoginController.login
 
 # Users
-GET     /user/me                    controllers.UserController.getMe()
-GET     /user/:username             controllers.UserController.getByUsername(username: String)
+GET     /rest/v1/user/me                    controllers.UserController.getMe()
+GET     /rest/v1/user/:username             controllers.UserController.getByUsername(username: String)
 
 # Documents
-GET     /document/:id                           controllers.DocumentController.getById(id: Int)
-PUT     /document/:id/description               controllers.DocumentController.patchDescription(id: Int)
-PUT     /document/:id/name                      controllers.DocumentController.patchName(id: Int)
-PUT     /document/:id/archiving-complete        controllers.DocumentController.archivingComplete(id: Int)
-PUT     /document/:id/action-required           controllers.DocumentController.actionRequired(id: Int)
-PUT     /document/:id/follow-up-timestamp       controllers.DocumentController.setFollowup(id: Int)
-DELETE  /document/:id/follow-up-timestamp       controllers.DocumentController.clearFollowup(id: Int)
-PUT     /document/:id/contact                   controllers.DocumentController.setContact(id: Int)
-DELETE  /document/:id/contact                   controllers.DocumentController.clearContact(id: Int)
-PUT     /document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.addTag(id: Int, tag: String)
-DELETE  /document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.deleteTag(id: Int, tag: String)
-POST    /document/:id/comments                  controllers.DocumentController.addComment(id: Int)
-POST    /document/:id/links                     controllers.DocumentController.addLink(id: Int)
-GET     /documents/attention                    controllers.DocumentController.attention(offset: Option[Int], limit: Option[Int])
-GET     /documents/meta                         controllers.MetaController.documentsMeta()
-GET     /documents                              controllers.DocumentController.search(q: String, fromArchiveTimestamp: Option[Long], toArchiveTimestamp: Option[Long], fromModificationTimestamp: Option[Long], toModificationTime: Option[Long], offset: Option[Int], limit: Option[Int])
+GET     /rest/v1/document/:id                           controllers.DocumentController.getById(id: Int)
+PUT     /rest/v1/document/:id/description               controllers.DocumentController.patchDescription(id: Int)
+PUT     /rest/v1/document/:id/name                      controllers.DocumentController.patchName(id: Int)
+PUT     /rest/v1/document/:id/archiving-complete        controllers.DocumentController.archivingComplete(id: Int)
+PUT     /rest/v1/document/:id/action-required           controllers.DocumentController.actionRequired(id: Int)
+PUT     /rest/v1/document/:id/follow-up-timestamp       controllers.DocumentController.setFollowup(id: Int)
+DELETE  /rest/v1/document/:id/follow-up-timestamp       controllers.DocumentController.clearFollowup(id: Int)
+PUT     /rest/v1/document/:id/contact                   controllers.DocumentController.setContact(id: Int)
+DELETE  /rest/v1/document/:id/contact                   controllers.DocumentController.clearContact(id: Int)
+PUT     /rest/v1/document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.addTag(id: Int, tag: String)
+DELETE  /rest/v1/document/:id/tags/$tag<[a-zA-Z\\d-]+>  controllers.DocumentController.deleteTag(id: Int, tag: String)
+POST    /rest/v1/document/:id/comments                  controllers.DocumentController.addComment(id: Int)
+POST    /rest/v1/document/:id/links                     controllers.DocumentController.addLink(id: Int)
+GET     /rest/v1/documents/attention                    controllers.DocumentController.attention(offset: Option[Int], limit: Option[Int])
+GET     /rest/v1/documents/meta                         controllers.MetaController.documentsMeta()
+GET     /rest/v1/documents                              controllers.DocumentController.search(q: String, fromArchiveTimestamp: Option[Long], toArchiveTimestamp: Option[Long], fromModificationTimestamp: Option[Long], toModificationTime: Option[Long], offset: Option[Int], limit: Option[Int])
 
 # Attachments
-GET     /attachment/:id/body                    controllers.AttachmentController.download(id: Int)
-GET     /attachment/:id/thumbnail               controllers.AttachmentController.thumbnail(id: Int)
+GET     /rest/v1/attachment/:id/body                    controllers.AttachmentController.download(id: Int)
+GET     /rest/v1/attachment/:id/thumbnail               controllers.AttachmentController.thumbnail(id: Int)
 
 # Contacts
-GET     /contact/:id/documents                  controllers.ContactController.getDocumentsForContact(id: Int, offset: Option[Int], limit: Option[Int])
-GET     /contact/:id                            controllers.ContactController.getById(id: Int)
-POST    /contact/:id                            controllers.ContactController.update(id: Int)
-POST    /contact                                controllers.ContactController.createNew()
-GET     /contacts                               controllers.ContactController.search(q: String, offset: Option[Int], limit: Option[Int])
+GET     /rest/v1/contact/:id/documents                  controllers.ContactController.getDocumentsForContact(id: Int, offset: Option[Int], limit: Option[Int])
+GET     /rest/v1/contact/:id                            controllers.ContactController.getById(id: Int)
+POST    /rest/v1/contact/:id                            controllers.ContactController.update(id: Int)
+POST    /rest/v1/contact                                controllers.ContactController.createNew()
+GET     /rest/v1/contacts                               controllers.ContactController.search(q: String, offset: Option[Int], limit: Option[Int])
 
 # Activities
-GET     /activities                             controllers.ActivitiesController.latest
+GET     /rest/v1/activities                             controllers.ActivitiesController.latest
 
 # Tags
-GET     /tags                                   controllers.TagController.search(q: String)
+GET     /rest/v1/tags                                   controllers.TagController.search(q: String)
 
 # Source configurations
-GET     /sources                                controllers.SourceController.getMine()
-POST    /source                                 controllers.SourceController.create()
-GET     /source/:id                             controllers.SourceController.get(id: Int)
-POST    /source/:id                             controllers.SourceController.update(id: Int)
-DELETE  /source/:id                             controllers.SourceController.delete(id: Int)
+GET     /rest/v1/sources                                controllers.SourceController.getMine()
+POST    /rest/v1/source                                 controllers.SourceController.create()
+GET     /rest/v1/source/:id                             controllers.SourceController.get(id: Int)
+POST    /rest/v1/source/:id                             controllers.SourceController.update(id: Int)
+DELETE  /rest/v1/source/:id                             controllers.SourceController.delete(id: Int)
 
 # Google OAuth flow
-GET     /google/oauthstart                      controllers.google.OAuthController.oauthStart()
-GET     /google/oauthreturn                     controllers.google.OAuthController.oauthReturn(code: Option[String])
-GET     /google/oauthrevoke                     controllers.google.OAuthController.oauthRevoke()
-GET     /google/drive/:id                       controllers.google.GDriveController.listFolder(id: String)
+GET     /rest/v1/google/oauthstart                      controllers.google.OAuthController.oauthStart()
+GET     /rest/v1/google/oauthreturn                     controllers.google.OAuthController.oauthReturn(code: Option[String])
+GET     /rest/v1/google/oauthrevoke                     controllers.google.OAuthController.oauthRevoke()
+GET     /rest/v1/google/drive/:id                       controllers.google.GDriveController.listFolder(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /*file                                          controllers.Assets.versioned(path="/public", file: Asset)
+GET     /                                               controllers.Default.redirect(to = "index.html")

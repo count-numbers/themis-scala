@@ -55,7 +55,7 @@ module.exports = function(grunt) {
      		      'app/components/util/trello.js',
      		      'app/components/util/gdrive.js'
     		],
-    		dest: '../src/main/webapp/<%= pkg.name %>.js'
+    		dest: '../public/<%= pkg.name %>.js'
     	},
     	css: {
     		src: [
@@ -67,7 +67,7 @@ module.exports = function(grunt) {
     		      'app/components/domain/dms-editable-markup.css',
     		      'app/components/domain/dms-contact.css'
     		],
-    		dest: '../src/main/webapp/css/<%= pkg.name %>.css'
+    		dest: '../public/css/<%= pkg.name %>.css'
     	},
     	libraries: {
     		separator : ';',
@@ -92,7 +92,7 @@ module.exports = function(grunt) {
     		      
     		      'app/bower_components/markdown/lib/markdown.js'
     		      ],
-    		dest: '../src/main/webapp/libs.js'
+    		dest: '../public/libs.js'
     	},
     	libcss: {
     		src: [
@@ -104,7 +104,7 @@ module.exports = function(grunt) {
 				'app/bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css',
 				'app/bower_components/selectize/dist/css/selectize.bootstrap3.css'
     		],
-    		dest: '../src/main/webapp/css/libs.css'
+    		dest: '../public/css/libs.css'
     	},
 
     },
@@ -115,8 +115,8 @@ module.exports = function(grunt) {
         mangle: false
       },
       build: {
-        src:  '../src/main/webapp/<%= pkg.name %>.js',
-        dest: '../src/main/webapp/<%= pkg.name %>.min.js'
+        src:  '../public/<%= pkg.name %>.js',
+        dest: '../public/<%= pkg.name %>.min.js'
       }
     },
     
@@ -137,7 +137,7 @@ module.exports = function(grunt) {
 	    	      'components/**/*.html',
 	    	      'static/**/*',
 	    	     ],
-	    	dest: '../src/main/webapp/'
+	    	dest: '../public/'
     	},
     	fonts: {
     		expand: true,
@@ -145,40 +145,40 @@ module.exports = function(grunt) {
 	    	src: [
 	    	      '*'
 	    	     ],
-	    	dest: '../src/main/webapp/fonts'    		
+	    	dest: '../public/fonts'    		
     	},
     },
     
     clean: {
     	 html: {
     		 src: [
-    		      '../src/main/webapp/index.html',
-			      '../src/main/webapp/admin',
-			      '../src/main/webapp/contact',
-			      '../src/main/webapp/document',
-			      '../src/main/webapp/home',
-			      '../src/main/webapp/login',
-			      '../src/main/webapp/profile',
-			      '../src/main/webapp/sources',
-			      '../src/main/webapp/components',
-			      '../src/main/webapp/static'
+    		      '../public/index.html',
+			      '../public/admin',
+			      '../public/contact',
+			      '../public/document',
+			      '../public/home',
+			      '../public/login',
+			      '../public/profile',
+			      '../public/sources',
+			      '../public/components',
+			      '../public/static'
 			      ] 
     	 },
     	 js: {
 	        src: [
-	              '../src/main/webapp/<%= pkg.name %>.js',
-	              '../src/main/webapp/<%= pkg.name %>.min.js'
+	              '../public/<%= pkg.name %>.js',
+	              '../public/<%= pkg.name %>.min.js'
 	              ]
 
     	 },
     	 libraries: {
-    		 src: [ '../src/main/webapp/libs.js' ]
+    		 src: [ '../public/libs.js' ]
     	 },
     	 css: {
-    		 src: [ '../src/main/webapp/css' ] 
+    		 src: [ '../public/css' ] 
     	 },
     	 fonts: {
-    		 src: ['../src/main/webapp/fonts']
+    		 src: ['../public/fonts']
     	 },
     	 
     	 options: {
