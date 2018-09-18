@@ -1,6 +1,7 @@
 package services.ingestion
 
 import java.nio.file.Paths
+import java.util.Locale
 
 import javax.inject.{Named, Singleton}
 import actions.DocumentActions
@@ -20,6 +21,8 @@ import scala.util.{Failure, Try}
 class IngestionService @Inject() (val config: Configuration,
                                   val system: ActorSystem,
                                   @Named("ingestion-actor") val ingestionActor: ActorRef)(implicit ec: ExecutionContext) {
+  Logger.info(s"Default encoding is ${System.getProperty("file.encoding")}." )
+  Logger.info(s"Default locale is ${Locale.getDefault.toString}.")
 
   system.scheduler.schedule(0.microseconds, 10.seconds, ingestionActor, "run-ingestion")
 }

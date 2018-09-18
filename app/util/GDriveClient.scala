@@ -49,7 +49,7 @@ case class ConfigRepoDataStore[V <: java.io.Serializable](configRepoDataStoreFac
   override def clear() = ??? // { this }
   override def values() = ??? //Collections.emptyList()
   override def delete(key: String) = {
-    Logger.warn(s"Deleting credentials for ${key}.")
+    Logger.info(s"Deleting credentials for ${key}.")
     val f: Future[Int] = configRepo.deleteKey("datastore:"+id+":"+key)
     Await.ready(f, Duration.Inf).value.get
     this
@@ -57,7 +57,7 @@ case class ConfigRepoDataStore[V <: java.io.Serializable](configRepoDataStoreFac
 
   override def get(key: String) = {
     val value: Try[Option[String]] = Await.ready(configRepo.getForKey("datastore:"+id+":"+key), Duration.Inf).value.get
-    Logger.debug(s"Existing credentials: ${value}")
+    //Logger.debug(s"Existing credentials: ${value}")
     value match {
       case Failure(ex) => { Logger.warn(s"Failed to load config key: ${ex}",ex); null.asInstanceOf[V] }
       case Success(None) => null.asInstanceOf[V]
@@ -75,7 +75,7 @@ case class ConfigRepoDataStore[V <: java.io.Serializable](configRepoDataStoreFac
 }
 class ConfigRepoDataStoreFactory(configRepository: ConfigRepository) extends AbstractDataStoreFactory {
   override def createDataStore[V <: java.io.Serializable](id: String) = {
-    Logger.info(s"Creating data store for ${id}")
+    Logger.debug(s"Creating data store for ${id}")
     new ConfigRepoDataStore(this, id, configRepository)
   }
 }

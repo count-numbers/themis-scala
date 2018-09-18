@@ -7,7 +7,7 @@
 	<div ng-switch="source.type">
 		<div ng-switch-when="gdrive" class="panel panel-primary">
 			<div class="panel-heading">
-				Fetch documents from Google Drive folder
+				<img src="https://www.google.com/drive/static/images/drive/logo-drive.png" width="24" height="24"/>&nbsp;Fetch documents from Google Drive folder
 				<span class="pull-right clickable-icon" ng-click="removeSource(source)" type="button">
 					<span class="glyphicon glyphicon-trash" aria-hidden="true" class="clickable-icon"></span>
 				</span>
@@ -41,7 +41,7 @@
 
 		<div ng-switch-when="file" class="panel panel-primary">
 			<div class="panel-heading">
-				Fetch documents from the file system
+				<span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;Fetch documents from the file system
 				<span class="pull-right clickable-icon" ng-click="removeSource(source)" type="button">
 					<span class="glyphicon glyphicon-trash" aria-hidden="true" class="clickable-icon"></span>
 				</span>
