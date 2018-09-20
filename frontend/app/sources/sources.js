@@ -11,8 +11,8 @@ angular.module('dms.sources', ['ngRoute'])
 
 .controller('SourcesCtrl', function($scope, Configuration, DocumentSources, $location, GDrive, Errors) {
 
-	$scope.googleOAuthURL  = Configuration.backendURL + "rest/v1/google/oauthstart"
-  	$scope.googleRevokeURL = Configuration.backendURL + "rest/v1/google/oauthrevoke"
+	$scope.googleOAuthURL  = Configuration.backendURL + "google/oauthstart"
+  	$scope.googleRevokeURL = Configuration.backendURL + "google/oauthrevoke"
 
     $scope.getGoogleAuthState = function() {
         return $location.search().googleauth;

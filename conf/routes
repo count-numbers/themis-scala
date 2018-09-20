@@ -51,10 +51,10 @@ POST    /rest/v1/source/:id                             controllers.SourceContro
 DELETE  /rest/v1/source/:id                             controllers.SourceController.delete(id: Int)
 
 # Google OAuth flow
-GET     /rest/v1/google/oauthstart                      controllers.google.OAuthController.oauthStart()
-GET     /rest/v1/google/oauthreturn                     controllers.google.OAuthController.oauthReturn(code: Option[String])
-GET     /rest/v1/google/oauthrevoke                     controllers.google.OAuthController.oauthRevoke()
-GET     /rest/v1/google/drive/:id                       controllers.google.GDriveController.listFolder(id: String)
+GET     /google/oauthstart                      controllers.google.OAuthController.oauthStart()
+GET     /google/oauthreturn                     controllers.google.OAuthController.oauthReturn(code: Option[String])
+GET     /google/oauthrevoke                     controllers.google.OAuthController.oauthRevoke()
+GET     /google/drive/:id                       controllers.google.GDriveController.listFolder(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /*file                                          controllers.Assets.versioned(path="/public", file: Asset)

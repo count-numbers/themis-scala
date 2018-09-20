@@ -67,6 +67,6 @@ dmsServices.factory('DocumentSources', ['$resource','Configuration',
 
 dmsServices.factory('GDrive', ['$resource', 'Configuration',
    function($resource, Configuration) {
-    return $resource(Configuration.backendURL+'rest/v1/google/drive/:folderId', {folderId:'@id'}, {
+    return $resource(Configuration.backendURL+'google/drive/:folderId', {folderId:'@id'}, {
     });
 }]);
