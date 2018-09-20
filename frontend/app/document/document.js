@@ -46,7 +46,7 @@ angular.module('dms.document', ['ngRoute'])
     $scope.submittingName = false;
     $scope.setName = function($data) {
     	$scope.submittingName = true;
-    	Document.setName({docId:$routeParams.docid}, $data,
+    	Document.update({id:$routeParams.docid, name:$data},
     			function(updatedDocument) {
     				$scope.submittingName = false;
     				$scope.document = updatedDocument;
@@ -65,7 +65,7 @@ angular.module('dms.document', ['ngRoute'])
         popoverOpen: false,
         markComplete: function() {
             $scope.submittingArchivingComplete = true;
-            Document.setArchivingComplete({docId:$routeParams.docid}, true,
+            Document.update({id:$routeParams.docid, archivingComplete: true},
                     function(updatedDocument) {
                         $scope.submittingArchivingComplete = false;
                         $scope.document = updatedDocument;
@@ -88,7 +88,7 @@ angular.module('dms.document', ['ngRoute'])
     	comment: "",
     	submit : function() {
     		$scope.actionRequired.submitting = true;
-	    	Document.setActionRequired({docId:$routeParams.docid}, !$scope.document.actionRequired,
+	    	Document.update({id:$routeParams.docid, actionRequired: !$scope.document.actionRequired},
 	    			function(updatedDocument) {
 	    				$scope.actionRequired.popoverOpen = false;
 	    				$scope.actionRequired.popoverResolveOpen = false;
@@ -116,7 +116,7 @@ angular.module('dms.document', ['ngRoute'])
     $scope.submitDescription = function(description) {
     	$scope.submittingDescription = true;
     	$scope.document.description = description; 
-    	Document.setDescription({docId:$routeParams.docid}, description,
+    	Document.update({id:$routeParams.docid, description:description},
     			function(updatedDocument) {
     				$scope.submittingDescription = false;
     				$scope.document = updatedDocument;
@@ -136,7 +136,7 @@ angular.module('dms.document', ['ngRoute'])
     	$scope.postComment($scope.newComment);
     }
     $scope.postComment = function(comment, callback) {
-    	Document.postComment({docId:$routeParams.docid}, comment,
+    	Document.postComment({docId:$routeParams.docid}, {text: comment},
     			function(commentEntity) {
 		    		$scope.newComment = ""; // reset textarea
 		    		$scope.document.comments.push(commentEntity);
@@ -346,7 +346,7 @@ angular.module('dms.document', ['ngRoute'])
     	},
     	submit : function() {
 			$scope.followUp.submitting = true;
-    		Document.setFollowup({docId:$routeParams.docid}, $scope.followUp.date,
+			Document.update({id:$routeParams.docid, followUpTimestamp: $scope.followUp.date},
         			function(updatedDocument) {
     					console.log(updatedDocument);
     					$scope.followUp.submitting = false;

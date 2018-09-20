@@ -1,22 +1,33 @@
 package controllers
 
 import java.text.SimpleDateFormat
-
-import models.{Comment, Document, Link}
-import javax.inject._
-
-import db.{CommentRepository, DocumentRepository}
-import play.api.libs.json.Json
-import play.api.mvc._
-import play.api.mvc.Action
-
-import scala.concurrent.{ExecutionContext, Future}
-import javax.inject.Singleton
+import java.util.Date
 
 import actions.DocumentActions
 import auth.{AuthAction, AuthorizedRequest}
-import play.api.{Configuration, Logger}
+import db.{CommentRepository, DocumentRepository}
+import javax.inject.{Singleton, _}
+import models.{Comment, Document, Link}
+import play.api.Configuration
+import play.api.libs.json.Json
+import play.api.mvc._
 import util.ErrorResponse
+
+import scala.concurrent.{ExecutionContext, Future, Promise}
+
+case class PatchableDocFields(name: Option[String],
+                              description: Option[String],
+                              archivingComplete: Option[Boolean],
+                              actionRequired: Option[Boolean],
+                              followUpTimestamp: Option[String])
+object PatchableDocFields {
+  implicit val readsPatchableDocFields = Json.reads[PatchableDocFields]
+}
+
+case class PostableComment(text: String)
+object PostableComment {
+  implicit val readsPostableComment = Json.reads[PostableComment]
+}
 
 /**
   * Created by simfischer on 3/9/17.
@@ -94,11 +105,11 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
     }
   }
 
-  def addComment(id: Int) = AuthAction().async(parse.text) {
+  def addComment(id: Int) = AuthAction().async(parse.json) {
     implicit request => {
-      val text = request.body
+      val comment = request.body.as[PostableComment]
       for {
-        commentOpt: Option[Comment] <- commentRepository.addToDocument(docId = id, text = text, username = request.username)
+        commentOpt: Option[Comment] <- commentRepository.addToDocument(docId = id, text = comment.text, username = request.username)
       } yield {
         commentOpt
           .map(comment => Created(Json.toJson(comment)).withHeaders("Location" -> getURI(id, s"comments/${comment.id}")))
@@ -120,26 +131,22 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
     }
   }
 
-  /** Updates the document's description and returns the document if it exists. Otherwise 404s. */
-  def patchDescription(id: Int) = AuthAction().async(parse.text) {
+  def patch(id: Int) = AuthAction().async(parse.json) {
     implicit request => {
-      val description = request.body
-      for {
-        docOpt: Option[Document] <- documentActions.setDescription(id, description, request.username)
-      } yield {
-        docOpt
-          .map((d: Document) => Ok(Json.toJson(d)))
-          .getOrElse(NotFound(ErrorResponse(404, "Not found", s"No document with id ${id}.")))
+      val patchedDoc = request.body.as[PatchableDocFields];
+      val doc: Future[Option[Document]] = patchedDoc match {
+        case PatchableDocFields(Some(name), None, None, None, None) => documentActions.rename(id, name, request.username)
+        case PatchableDocFields(None, Some(description), None, None, None) => documentActions.setDescription(id, description, request.username)
+        case PatchableDocFields(None, None, Some(archivingComplete), None, None) => documentActions.markArchivingComplete(id, archivingComplete, request.username)
+        case PatchableDocFields(None, None, None, Some(actionRequired), None) => documentActions.markActionRequired(id, actionRequired, request.username)
+        case PatchableDocFields(None, None, None, None, Some(followUp)) => {
+          val parsedFollowUp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(followUp)
+          documentActions.setFollowup(id, Some(parsedFollowUp), request.username)
+        }
+        case _ => Promise[Option[Document]]().failure(new IllegalArgumentException("Exactly one field must be set")).future
       }
-    }
-  }
-
-  /** Updates the document's description and returns the document if it exists. Otherwise 404s. */
-  def patchName(id: Int) = AuthAction().async(parse.text) {
-    implicit request => {
-      val name = request.body
       for {
-          docOpt <- documentActions.rename(docId = id, name = name, username = request.username)
+        docOpt <- doc
       } yield {
         docOpt
           .map((d: Document) => Ok(Json.toJson(d)))
@@ -174,53 +181,10 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
   }
 
   /** Updates the document's description and returns the document if it exists. Otherwise 404s. */
-  def setFollowup(id: Int) = AuthAction().async(parse.json) {
-    implicit request => {
-      println(s"Date: ${request.body}")
-      val timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(request.body.as[String])
-      for {
-        docOpt <- documentActions.setFollowup(docId = id, timestamp = Some(timestamp), username = request.username)
-      } yield {
-        docOpt
-          .map((d: Document) => Ok(Json.toJson(d)))
-          .getOrElse(NotFound(ErrorResponse(404, "Not found", s"No document with id ${id}.")))
-      }
-    }
-  }
-
-  /** Updates the document's description and returns the document if it exists. Otherwise 404s. */
   def clearFollowup(id: Int) = AuthAction().async {
     implicit request => {
       for {
         docOpt <- documentActions.setFollowup(docId = id, timestamp = None, username = request.username)
-      } yield {
-        docOpt
-          .map((d: Document) => Ok(Json.toJson(d)))
-          .getOrElse(NotFound(ErrorResponse(404, "Not found", s"No document with id ${id}.")))
-      }
-    }
-  }
-
-  /** Updates the document's description and returns the document if it exists. Otherwise 404s. */
-  def archivingComplete(id: Int) = AuthAction().async(parse.text) {
-    implicit request => {
-      val complete = request.body.toBoolean
-      for {
-        docOpt: Option[Document] <- documentActions.markArchivingComplete(id, complete, request.username)
-      } yield {
-        docOpt
-          .map((d: Document) => Ok(Json.toJson(d)))
-          .getOrElse(NotFound(ErrorResponse(404, "Not found", s"No document with id ${id}.")))
-      }
-    }
-  }
-
-  /** Updates the document's description and returns the document if it exists. Otherwise 404s. */
-  def actionRequired(id: Int) = AuthAction().async(parse.text) {
-    implicit request => {
-      val actionRequired = request.body.toBoolean
-      for {
-        docOpt: Option[Document]   <- documentActions.markActionRequired(docId = id, actionRequired = actionRequired, username = request.username)
       } yield {
         docOpt
           .map((d: Document) => Ok(Json.toJson(d)))

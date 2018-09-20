@@ -14,11 +14,7 @@ GET     /rest/v1/user/:username             controllers.UserController.getByUser
 
 # Documents
 GET     /rest/v1/document/:id                           controllers.DocumentController.getById(id: Int)
-PUT     /rest/v1/document/:id/description               controllers.DocumentController.patchDescription(id: Int)
-PUT     /rest/v1/document/:id/name                      controllers.DocumentController.patchName(id: Int)
-PUT     /rest/v1/document/:id/archiving-complete        controllers.DocumentController.archivingComplete(id: Int)
-PUT     /rest/v1/document/:id/action-required           controllers.DocumentController.actionRequired(id: Int)
-PUT     /rest/v1/document/:id/follow-up-timestamp       controllers.DocumentController.setFollowup(id: Int)
+PATCH   /rest/v1/document/:id                           controllers.DocumentController.patch(id: Int)
 DELETE  /rest/v1/document/:id/follow-up-timestamp       controllers.DocumentController.clearFollowup(id: Int)
 PUT     /rest/v1/document/:id/contact                   controllers.DocumentController.setContact(id: Int)
 DELETE  /rest/v1/document/:id/contact                   controllers.DocumentController.clearContact(id: Int)

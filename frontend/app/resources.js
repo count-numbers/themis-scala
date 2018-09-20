@@ -3,19 +3,16 @@ var dmsServices = angular.module('dms.resources', ['ngResource']);
 dmsServices.factory('Document', ['$resource', 'Configuration',
   function($resource, Configuration) {
     return $resource(Configuration.backendURL + 'rest/v1/document/:docId', {docId:'@id'}, {
-    	setName: {method:'PUT', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/name', headers: {"Content-Type": "text/plain"}},
-    	setDescription: {method:'PUT', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/description', headers: {"Content-Type": "text/plain"}},
-    	setArchivingComplete: {method:'PUT', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/archiving-complete', headers: {"Content-Type": "text/plain"}},
-    	setActionRequired: {method:'PUT', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/action-required', headers: {"Content-Type": "text/plain"}},
+        update: {method: 'PATCH' },
+
     	setContact: {method:'PUT', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/contact', headers: {"Content-Type": "text/plain"}},
     	clearContact: {method:'DELETE', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/contact'},
-    	setFollowup: {method:'PUT', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/follow-up-timestamp'},
     	clearFollowup: {method:'DELETE', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/follow-up-timestamp'},
     	
     	addTag: {method:'PUT', params:{docId:'@docId', tagName:'@tagName'}, url:Configuration.backendURL + 'rest/v1/document/:docId/tags/:tagName'},
     	deleteTag: {method:'DELETE', params:{docId:'@docId', tagName:'@tagName'}, url:Configuration.backendURL + 'rest/v1/document/:docId/tags/:tagName'},
     	
-    	postComment: {method:'POST', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/comments', headers: {"Content-Type": "text/plain"}},
+    	postComment: {method:'POST', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/comments'},
 
     	addLink: {method:'POST', params:{docId:'@docId'}, url:Configuration.backendURL + 'rest/v1/document/:docId/links'},
 
