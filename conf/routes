@@ -49,6 +49,7 @@ POST    /rest/v1/source                                 controllers.SourceContro
 GET     /rest/v1/source/:id                             controllers.SourceController.get(id: Int)
 POST    /rest/v1/source/:id                             controllers.SourceController.update(id: Int)
 DELETE  /rest/v1/source/:id                             controllers.SourceController.delete(id: Int)
+POST    /rest/v1/source/:id/execution                   controllers.SourceController.execute(id: Int)
 
 # Google OAuth flow
 GET     /google/oauthstart                      controllers.google.OAuthController.oauthStart()

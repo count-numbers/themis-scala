@@ -32,6 +32,10 @@ body {
 }	
 
 /* Spacing */
+.skip-right-label {
+	margin-right:0.25ex;
+}
+
 .skip-right-related {
 	margin-right:1ex;	
 }

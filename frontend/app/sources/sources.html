@@ -28,7 +28,10 @@
 					<gdrive-fileselector folder="source.gdriveArchiveFolderId" label="'Archive folder'"></gdrive-fileselector>
 				</form>
 
-				<a class="btn btn-primary" role="button" href="{{googleOAuthURL}}">Authorize Google</a>
+				<a class="btn btn-default" ng-click="execute(source.id)">
+					<span class="glyphicon glyphicon-play skip-right-label" aria-hidden="true"></span>Run once
+				</a>
+				<a class="btn btn-default" role="button" href="{{googleOAuthURL}}">Authorize Google</a>
 				<a class="btn btn-danger" role="button" href="{{googleRevokeURL}}">Revoke authorization</a>
 				<div ng-switch="getGoogleAuthState()">
 					<div ng-switch-when="skipped" class="alert alert-success"><strong>Success.</strong> Authorization to Google Drive was already granted. Re-using existing token.</div>
@@ -41,7 +44,7 @@
 
 		<div ng-switch-when="file" class="panel panel-primary">
 			<div class="panel-heading">
-				<span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;Fetch documents from the file system
+				<span class="glyphicon glyphicon-folder-open skip-right-label" aria-hidden="true"></span>Fetch documents from the file system
 				<span class="pull-right clickable-icon" ng-click="removeSource(source)" type="button">
 					<span class="glyphicon glyphicon-trash" aria-hidden="true" class="clickable-icon"></span>
 				</span>
@@ -61,6 +64,10 @@
 						</div>
 					</div>
 				</form>
+
+				<button class="btn btn-default skip-top-unrelated" ng-click="execute(source.id)">
+					<span class="glyphicon glyphicon-play skip-right-label" aria-hidden="true"></span>Run once
+				</button>
 			</div>
 		</div>
 		<div ng-switch-default class="panel panel-primary">

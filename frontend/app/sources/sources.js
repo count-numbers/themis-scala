@@ -34,4 +34,8 @@ angular.module('dms.sources', ['ngRoute'])
             DocumentSources.save(src);
         });
     }
+    $scope.execute = function(id) {
+            console.log("Executing source "+id);
+            DocumentSources.execute({id:id});
+    }
 });

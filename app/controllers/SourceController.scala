@@ -4,15 +4,19 @@ import auth.{AuthAction, AuthorizedRequest}
 import db.{SourceRepository, Tables}
 import javax.inject.{Inject, Singleton}
 import models.DocumentSource
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.libs.json.Json
 import play.api.mvc.Controller
+import services.ingestion.{IngestionService, IngestionServiceActor}
 import util.ErrorResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SourceController @Inject()(val sourceRepository: SourceRepository, val config: Configuration, implicit val exec: ExecutionContext) extends Controller {
+class SourceController @Inject()(val sourceRepository: SourceRepository,
+                                 val config: Configuration,
+                                 val ingestionServiceActor: IngestionServiceActor,
+                                 implicit val exec: ExecutionContext) extends Controller {
 
   def getMine() = AuthAction().async {
     implicit req => {
@@ -54,6 +58,14 @@ class SourceController @Inject()(val sourceRepository: SourceRepository, val con
       sourceRepository
         .delete(id)
         .map(if (_) NoContent else NotFound)
+    }
+  }
+
+  def execute(id: Int) = AuthAction().async {
+    implicit request => {
+      Logger.info(s"Executing source ${id}.")
+      ingestionServiceActor.runSingle(id)
+      Future{NoContent}
     }
   }
 
