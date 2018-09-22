@@ -111,7 +111,7 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
       (((doc, user), tagging), tag) <- (db.Tables.Document
         joinLeft db.Tables.User on (_.owner === _.id)
         joinLeft db.Tables.Tagging on (_._1.id === _.docid)
-        joinLeft db.Tables.Dtag on (_._2.map(_.tagid) === _.id)) if fulltextMatch(doc.fulltext, searchTerm)
+        joinLeft db.Tables.Dtag on (_._2.map(_.tagid) === _.id)) if (fulltextMatch(doc.fulltext, searchTerm)  || (searchTerm == ""))
     } yield (doc, user, tag)
 
     val resultFuture: Future[Seq[(DocumentRow, Option[UserRow], Option[DtagRow])]] = dbConfig.db.run(query.drop(offset).take(limit).result)
@@ -216,13 +216,14 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
               description: Option[String],
               sourceId: String,
               sourceReference: String,
-              ownerId: Int): Future[Int] = {
+              ownerId: Int,
+              contactId: Option[Int]): Future[Int] = {
     val now = new java.sql.Timestamp(System.currentTimeMillis());
     // we're projecting to only the columns we want to insert because we must avoid inserting fulltext - it would
     // cause an SQL type error since Strings do not match to Postgres tsvectors. fulltext is populated
     // via a DB trigger
-    val action = (Tables.Document.map(dr => (dr.name, dr.description, dr.sourceid, dr.sourcereference, dr.owner, dr.archivingcomplete, dr.actionrequired, dr.archivetimestamp, dr.modificationtimestamp))
-      returning Tables.Document.map(_.id)) += (name, description.map(_.replaceAll("\u0000", "")), sourceId, sourceReference, ownerId, false, false, now, now)
+    val action = (Tables.Document.map(dr => (dr.name, dr.description, dr.sourceid, dr.sourcereference, dr.owner, dr.archivingcomplete, dr.actionrequired, dr.archivetimestamp, dr.modificationtimestamp, dr.contact))
+      returning Tables.Document.map(_.id)) += (name, description.map(_.replaceAll("\u0000", "")), sourceId, sourceReference, ownerId, false, false, now, now, contactId)
 
     val f: Future[Int] = dbConfig.db.run(action)
     f.onSuccess({ case id: Int => Logger.info(s"Inserted document with id ${id}")})

@@ -109,14 +109,15 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
                 description: Option[String],
                 sourceId: String,
                 sourceReference: String,
-                ownerUsername: String): Future[Int] = {
+                ownerUsername: String,
+                contactId: Option[Int]): Future[Int] = {
     for {
       // first, find user
       user: Option[User]            <- userRepository.getByUsername(ownerUsername)
       // now, do the actual action
       ((docId: Int, userId: Int))   <- user match {
                                         case None => Future.failed(new Exception(s"User ${ownerUsername} not found."))
-                                        case Some(user) => documentRepository.persist(name, description, sourceId, sourceReference, user.id).map(docId => (docId, user.id))
+                                        case Some(user) => documentRepository.persist(name, description, sourceId, sourceReference, user.id, contactId).map(docId => (docId, user.id))
                                       }
       success: Boolean              <- activityRepository.persist(docId = docId, userId = userId, timestamp = System.currentTimeMillis(), activityType = ActivityType.Created.toString, arguments = Seq(name))
     } yield docId

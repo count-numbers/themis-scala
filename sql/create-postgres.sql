@@ -28,7 +28,8 @@ CREATE TABLE contact (
     city VARCHAR,
     region VARCHAR,
     country VARCHAR,
-    email VARCHAR
+    email VARCHAR,
+    keywords VARCHAR
 );
 
 CREATE TABLE document (

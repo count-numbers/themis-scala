@@ -47,6 +47,11 @@ class ContactRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider, 
       .map(_.map(Contact.of(_)))
   }
 
+  def keywords: Future[Seq[(Int, String)]] = {
+    val q = Tables.Contact.filter(_.keywords.isDefined).map(c => (c.id, c.keywords.get))
+    dbConfig.db.run(q.result)
+  }
+
   def toRow(contact: Contact): ContactRow = ContactRow(
     id = contact.id.getOrElse(-1),
     identifier = contact.identifier,
@@ -57,6 +62,7 @@ class ContactRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider, 
     city = contact.city,
     region = contact.region,
     country = contact.country,
-    email = contact.email
+    email = contact.email,
+    keywords =  contact.keywords
   )
 }

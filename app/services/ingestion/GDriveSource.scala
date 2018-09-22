@@ -4,14 +4,14 @@ import java.io.{FileOutputStream, OutputStream}
 import java.nio.file.Path
 
 import actions.DocumentActions
-import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag
+import db.ContactRepository
 import play.api.{Configuration, Logger}
 import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
 import util.{GDriveClient, GDriveFile}
 
 import scala.concurrent.ExecutionContext
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 class GDriveSource(username: String,
                    sourceFolderID: String,
@@ -22,9 +22,10 @@ class GDriveSource(username: String,
                    documentActions: DocumentActions,
                    thumbnailService: ThumbnailService,
                    contentExtractorService: ContentExtractorService,
+                   contactRepository: ContactRepository,
                    ingestionNotifier: IngestionNotifier,
                    executionContext: ExecutionContext)
-  extends DocumentSource[GDriveFile]("gdrive", username, config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext) {
+  extends DocumentSource[GDriveFile]("gdrive", username, config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, executionContext) {
 
 
   override def findDocuments: Try[Seq[(String, String, GDriveFile)]] = {

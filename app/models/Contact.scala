@@ -15,7 +15,8 @@ case class Contact(id: Option[Int],
                    city: Option[String],
                    region: Option[String],
                    country: Option[String],
-                   email: Option[String])
+                   email: Option[String],
+                   keywords: Option[String])
 
 object Contact {
 
@@ -29,7 +30,8 @@ object Contact {
       city =  row.city,
       region = row.region,
       country = row.country,
-      email = row.email
+      email = row.email,
+      keywords = row.keywords
   )
 
 

@@ -7,7 +7,7 @@ import javax.inject.{Named, Singleton}
 import actions.DocumentActions
 import akka.actor.{Actor, ActorRef, ActorSystem}
 import com.google.inject.Inject
-import db.{SourceRepository, Tables}
+import db.{ContactRepository, SourceRepository, Tables}
 import play.api.{Configuration, Logger}
 import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
@@ -36,6 +36,7 @@ class IngestionServiceActor @Inject() (val config: Configuration, val ingestionN
                                        val documentActions: DocumentActions,
                                        val thumbnailService: ThumbnailService,
                                        val contentExtractorService: ContentExtractorService,
+                                       val contactRepository: ContactRepository,
                                        implicit val executionContext: ExecutionContext) extends Actor {
 
   override def receive: Receive = {
@@ -67,12 +68,12 @@ class IngestionServiceActor @Inject() (val config: Configuration, val ingestionN
       case (Tables.SourceRow(_, "gdrive", _, _, Some(gdriveSourceFolder: String), Some(gdriveArchiveFolder: String), _),
       Some(Tables.UserRow(_, username: String, _, _, _)))
       => Some(new GDriveSource(username, gdriveSourceFolder, gdriveArchiveFolder,
-        gDriveClientFactory.build(username), config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext))
+        gDriveClientFactory.build(username), config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, executionContext))
 
       case (Tables.SourceRow(_, "file", _, _, _, _, Some(fileSourceFolder: String)),
       Some(Tables.UserRow(_, username: String, _, _, _)))
       =>
-        Some(new FileSource(username, Paths.get(fileSourceFolder), config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext))
+        Some(new FileSource(username, Paths.get(fileSourceFolder), config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, executionContext))
 
       case _ => {
         Logger.warn(s"Illegal or incomplete source definition ${sourceAndUser}.");

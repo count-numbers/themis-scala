@@ -3,6 +3,7 @@ package services.ingestion
 import java.nio.file.{Files, Path, Paths}
 
 import actions.DocumentActions
+import db.ContactRepository
 import play.api.{Configuration, Logger}
 import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
@@ -25,6 +26,7 @@ abstract class DocumentSource[T](val sourceId: String,
                                  documentActions: DocumentActions,
                                  thumbnailService: ThumbnailService,
                                  contentExtractorService: ContentExtractorService,
+                                 contactRepository: ContactRepository,
                                  ingestionNotifier: IngestionNotifier,
                                  implicit val executionContext: ExecutionContext) {
 
@@ -35,6 +37,19 @@ abstract class DocumentSource[T](val sourceId: String,
   def findDocuments: Try[Seq[(String, String, T)]]
 
   def importToTemp(t: T): Try[Path]
+
+  def findContact(description: String, contactKeywords: Seq[(Int, String)]): Option[Int] = {
+    contactKeywords
+      .filter({
+        case (contactId: Int, keywords: String) => {
+          keywords
+            .split(',')
+            .exists(kw => description.toLowerCase().contains(kw.toLowerCase))
+        }
+      })
+      .map(_._1)
+      .headOption
+  }
 
   def run(): Try[Unit] = {
     val foundTry: Try[Seq[(String, String, T)]] = findDocuments
@@ -58,11 +73,13 @@ abstract class DocumentSource[T](val sourceId: String,
           }
           Logger.debug(s"Extracted ${description.map(_.length)} bytes of content.")
           for {
+            keywords: Seq[(Int, String)] <- contactRepository.keywords
             docId: Int <- documentActions.createNew(name = name,
               description = description,
               ownerUsername = username,
               sourceId = sourceId,
-              sourceReference = sourceRef)
+              sourceReference = sourceRef,
+              contactId = description.flatMap(findContact(_, keywords)))
             attachmentId: Option[Int] <- documentActions.addAttachment(docId = docId, name = name, size = size, mimeType = mimeType, username = username)
           } yield {
             Logger.debug(s"Assigned new document ID ${docId}, attachment ${attachmentId}.")

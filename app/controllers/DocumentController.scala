@@ -1,14 +1,13 @@
 package controllers
 
 import java.text.SimpleDateFormat
-import java.util.Date
 
 import actions.DocumentActions
 import auth.{AuthAction, AuthorizedRequest}
 import db.{CommentRepository, DocumentRepository}
 import javax.inject.{Singleton, _}
 import models.{Comment, Document, Link}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.libs.json.Json
 import play.api.mvc._
 import util.ErrorResponse
@@ -61,6 +60,7 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
              offset: Option[Int],
              limit: Option[Int]) = AuthAction().async {
     request => {
+      Logger.debug(s"Searching ${q} from ${fromArchiveTimestamp} to ${toArchiveTimestamp}.")
       val resultFuture: Future[Seq[Document]] = documentRepository.searchWithTags(q, fromArchiveTimestamp, toArchiveTimestamp, fromModificationTimestamp, toModificationTime, offset.getOrElse(0), limit.getOrElse(10))
       for (result <- resultFuture)
         yield Ok(Json.toJson(result))

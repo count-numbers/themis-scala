@@ -65,6 +65,13 @@
 			</div>
 		</div>
 
+		<div class="form-group">
+			<label for="keywords">Keywords (for automatic recognition):</label>
+			<div>
+				<input type="text" class="form-control" id="keywords" ng-model="contact.keywords">
+			</div>
+		</div>
+
 		<button class="btn btn-primary" ng-click="saveContact()" ng-disabled="form.$invalid || savingContact">
 			{{contact.id ? 'Save' : (isLinkingToDocument() ? 'Crete and link to '+targetDocumentName() : 'Create')}}
 		</button>

@@ -4,6 +4,7 @@ import java.io.IOException
 import java.nio.file.{Files, Path}
 
 import actions.DocumentActions
+import db.ContactRepository
 import play.api.{Configuration, Logger}
 import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
@@ -18,9 +19,10 @@ class FileSource( username: String,
                   documentActions: DocumentActions,
                   thumbnailService: ThumbnailService,
                   contentExtractorService: ContentExtractorService,
+                  contactRepository: ContactRepository,
                   ingestionNotifier: IngestionNotifier,
                   executionContext: ExecutionContext)
-  extends DocumentSource[Path]("file", username, config, documentActions, thumbnailService, contentExtractorService, ingestionNotifier, executionContext) {
+  extends DocumentSource[Path]("file", username, config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, executionContext) {
 
   import scala.collection.JavaConverters._
 
