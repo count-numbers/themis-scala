@@ -30,27 +30,36 @@ class IngestionService @Inject() (val config: Configuration,
 /**
   */
 @Singleton
-class IngestionServiceActor @Inject() (val config: Configuration, val ingestionNotifier: IngestionNotifier,
-                                       val gDriveClientFactory: GDriveClientFactory,
-                                       val sourceRepository: SourceRepository,
-                                       val documentActions: DocumentActions,
-                                       val thumbnailService: ThumbnailService,
-                                       val contentExtractorService: ContentExtractorService,
-                                       val contactRepository: ContactRepository,
-                                       implicit val executionContext: ExecutionContext) extends Actor {
+class IngestionServiceActor @Inject() (ingestionServiceRunner: IngestionServiceRunner) extends Actor {
 
   override def receive: Receive = {
     case msg: String => {
-      Logger.debug(s"Running ingestion service: ${msg}")
+      Logger.debug(s"Ingestion actor called: ${msg}")
+      ingestionServiceRunner.runAll();
+    }
+  }
+}
 
-      for {
-        sources: Seq[(Tables.SourceRow, Option[Tables.UserRow])] <- sourceRepository.getAllActive()
-        sourceAndUser: (Tables.SourceRow, Option[Tables.UserRow]) <- sources
-      } {
-        Logger.debug(s"Found active document source configuration: ${sourceAndUser}")
+@Singleton
+class IngestionServiceRunner @Inject() (val config: Configuration, val ingestionNotifier: IngestionNotifier,
+                                        val gDriveClientFactory: GDriveClientFactory,
+                                        val sourceRepository: SourceRepository,
+                                        val documentActions: DocumentActions,
+                                        val thumbnailService: ThumbnailService,
+                                        val contentExtractorService: ContentExtractorService,
+                                        val contactRepository: ContactRepository,
+                                        implicit val executionContext: ExecutionContext) {
 
-        runSource(sourceAndUser)
-      }
+  def runAll(): Unit= {
+    Logger.debug(s"Running ingestion service for all sources.")
+
+    for {
+      sources: Seq[(Tables.SourceRow, Option[Tables.UserRow])] <- sourceRepository.getAllActive()
+      sourceAndUser: (Tables.SourceRow, Option[Tables.UserRow]) <- sources
+    } {
+      Logger.debug(s"Found active document source configuration: ${sourceAndUser}")
+
+      runSource(sourceAndUser)
     }
   }
 
