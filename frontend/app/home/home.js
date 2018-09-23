@@ -12,6 +12,7 @@ angular.module('dms.home', ['ngRoute'])
 .controller('HomeCtrl', function($scope, Document, Activity, Errors) {
 	$scope.loadingActivityFeed = true;
 	$scope.loadingDocuments    = true;
+
 	$scope.activityStream = Activity.query({}, 
 			function() { 
 				$scope.loadingActivityFeed = false; 

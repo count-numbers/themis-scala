@@ -1,21 +1,15 @@
 package services.ingestion
 
-import java.nio.file.Paths
 import java.util.Locale
 
-import javax.inject.{Named, Singleton}
-import actions.DocumentActions
+import actions.IngestionActions
 import akka.actor.{Actor, ActorRef, ActorSystem}
 import com.google.inject.Inject
-import db.{ContactRepository, SourceRepository, Tables}
+import javax.inject.{Named, Singleton}
 import play.api.{Configuration, Logger}
-import services.contentextraction.ContentExtractorService
-import services.thumbnail.ThumbnailService
-import util.GDriveClientFactory
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.util.{Failure, Try}
 
 @Singleton
 class IngestionService @Inject() (val config: Configuration,
@@ -30,80 +24,12 @@ class IngestionService @Inject() (val config: Configuration,
 /**
   */
 @Singleton
-class IngestionServiceActor @Inject() (ingestionServiceRunner: IngestionServiceRunner) extends Actor {
+class IngestionServiceActor @Inject() (ingestionActions: IngestionActions) extends Actor {
 
   override def receive: Receive = {
     case msg: String => {
       Logger.debug(s"Ingestion actor called: ${msg}")
-      ingestionServiceRunner.runAll();
+      ingestionActions.runAll();
     }
-  }
-}
-
-@Singleton
-class IngestionServiceRunner @Inject() (val config: Configuration, val ingestionNotifier: IngestionNotifier,
-                                        val gDriveClientFactory: GDriveClientFactory,
-                                        val sourceRepository: SourceRepository,
-                                        val documentActions: DocumentActions,
-                                        val thumbnailService: ThumbnailService,
-                                        val contentExtractorService: ContentExtractorService,
-                                        val contactRepository: ContactRepository,
-                                        implicit val executionContext: ExecutionContext) {
-
-  def runAll(): Unit= {
-    Logger.debug(s"Running ingestion service for all sources.")
-
-    for {
-      sources: Seq[(Tables.SourceRow, Option[Tables.UserRow])] <- sourceRepository.getAllActive()
-      sourceAndUser: (Tables.SourceRow, Option[Tables.UserRow]) <- sources
-    } {
-      Logger.debug(s"Found active document source configuration: ${sourceAndUser}")
-
-      runSource(sourceAndUser)
-    }
-  }
-
-  def runSingle(id: Int): Unit = {
-    for {
-      sourceAndUserOpt: Option[(_root_.db.Tables.SourceRow, Option[_root_.db.Tables.UserRow])] <- sourceRepository.getById(id)
-      sourceAndUser: (_root_.db.Tables.SourceRow, Option[_root_.db.Tables.UserRow]) <- sourceAndUserOpt
-    }  {
-      runSource(sourceAndUser._1, sourceAndUser._2)
-    }
-  }
-
-  private def runSource(sourceAndUser: (_root_.db.Tables.SourceRow, Option[_root_.db.Tables.UserRow])) = {
-    val source: Option[DocumentSource[_]] = sourceAndUser match {
-      case (Tables.SourceRow(_, "gdrive", _, _, Some(gdriveSourceFolder: String), Some(gdriveArchiveFolder: String), _),
-      Some(Tables.UserRow(_, username: String, _, _, _)))
-      => Some(new GDriveSource(username, gdriveSourceFolder, gdriveArchiveFolder,
-        gDriveClientFactory.build(username), config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, executionContext))
-
-      case (Tables.SourceRow(_, "file", _, _, _, _, Some(fileSourceFolder: String)),
-      Some(Tables.UserRow(_, username: String, _, _, _)))
-      =>
-        Some(new FileSource(username, Paths.get(fileSourceFolder), config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, executionContext))
-
-      case _ => {
-        Logger.warn(s"Illegal or incomplete source definition ${sourceAndUser}.");
-        None
-      }
-    }
-
-    source.foreach(source => {
-      var srcId = sourceAndUser._1.id;
-      Logger.debug(s"Executing document source ${srcId} of type ${source.sourceId} for user ${source.username}.")
-      source.run match {
-        case Failure(ex) => {
-          Logger.warn(s"Document source ${srcId} failed: ${ex}", ex)
-          sourceRepository.deactivate(sourceAndUser._1.id)
-            .onSuccess({ case _ => Logger.info(s"Deactivated source ${srcId}") })
-        }
-        case _ => {
-          Logger.debug(s"Document source ${srcId} completed.")
-        }
-      }
-    })
-
   }
 }

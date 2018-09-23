@@ -99,7 +99,7 @@
                             </tr>
                             <tr>
                                 <td>Archived</td>
-                                <td>{{document.archiveTimestamp | date:'short'}}</td>
+                                <td>{{document.archiveTimestamp | date:'yyyy-MM-dd HH:mm'}}</td>
                             </tr>
                             <tr>
                                 <td>Importer</td>
@@ -127,12 +127,12 @@
 
                             <tr>
                                 <td>Modified</td>
-                                <td>{{document.modificationTimestamp | date:'short'}}</td>
+                                <td>{{document.modificationTimestamp | date:'yyyy-MM-dd HH:mm'}}</td>
                             </tr>
                             <tr ng-show="document.followUpTimestamp">
                                 <td>Follow-up</td>
                                 <td>
-                                    {{document.followUpTimestamp | date:'short'}}
+                                    {{document.followUpTimestamp | date:'yyyy-MM-dd HH:mm'}}
                                     <a class="btn btn-xs" ng-click="followUp.clearFollowup()"><span class="glyphicon glyphicon-remove"></span></a>
                                 </td>
                             </tr>

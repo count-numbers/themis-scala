@@ -4,7 +4,7 @@ import java.io.{FileOutputStream, OutputStream}
 import java.nio.file.Path
 
 import actions.DocumentActions
-import db.ContactRepository
+import db.{ContactRepository, IngestionLogRepository}
 import play.api.{Configuration, Logger}
 import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
@@ -13,7 +13,8 @@ import util.{GDriveClient, GDriveFile}
 import scala.concurrent.ExecutionContext
 import scala.util.Try
 
-class GDriveSource(username: String,
+class GDriveSource(id: Int,
+                   username: String,
                    sourceFolderID: String,
                    archiveFolderID: String,
                    gdrive: GDriveClient,
@@ -24,9 +25,9 @@ class GDriveSource(username: String,
                    contentExtractorService: ContentExtractorService,
                    contactRepository: ContactRepository,
                    ingestionNotifier: IngestionNotifier,
+                   ingestionLogRepository: IngestionLogRepository,
                    executionContext: ExecutionContext)
-  extends DocumentSource[GDriveFile]("gdrive", username, config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, executionContext) {
-
+  extends DocumentSource[GDriveFile](id,"gdrive", username, config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, ingestionLogRepository, executionContext) {
 
   override def findDocuments: Try[Seq[(String, String, GDriveFile)]] = {
     val filesTry: Try[Seq[GDriveFile]] =  gdrive.listFolder(Some(sourceFolderID))
@@ -41,12 +42,14 @@ class GDriveSource(username: String,
   }
 
   override def importToTemp(file: GDriveFile): Try[Path] = {
-    Logger.info(s"Downloading gdrive file ${file.id} to ${tempDir}.")
+    Logger.info(s"Downloading gdrive file ${file.name} to ${tempDir}.")
+    ingestionLogRepository.info(s"Downloading gdrive file ${file.name} to ${tempDir}.", Some(id), Some(username), None)
     val dest: Path = tempDir.resolve(file.name)
     val out: OutputStream = new FileOutputStream(dest.toFile)
     gdrive.driveTry.map(drive => {
       drive.files().get(file.id).executeMediaAndDownloadTo(out)
-      Logger.debug(s"Moving gdrive file ${file.id} from ${sourceFolderID} to ${archiveFolderID}.")
+      Logger.info(s"Moving downloaded gdrive file from ${dest.toFile} to ${archiveFolderID}.")
+      ingestionLogRepository.info(s"Moving downloaded gdrive file from ${dest.toFile} to ${archiveFolderID}.", Some(id), Some(username), None)
       drive.files().update(file.id, null)
         .setAddParents(archiveFolderID)
         .setRemoveParents(sourceFolderID)

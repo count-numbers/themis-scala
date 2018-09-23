@@ -65,6 +65,12 @@ dmsServices.factory('DocumentSources', ['$resource','Configuration',
     });
   }]);
 
+dmsServices.factory('IngestionLog', ['$resource','Configuration',
+  function($resource, Configuration){
+    return $resource(Configuration.backendURL + 'rest/v1/ingestion-log/:logId', {logId:'@id'}, {
+      query: {method:'GET', params:{}, isArray:true, url:Configuration.backendURL + 'rest/v1/ingestion-log'}
+    });
+  }]);
 
 dmsServices.factory('GDrive', ['$resource', 'Configuration',
    function($resource, Configuration) {

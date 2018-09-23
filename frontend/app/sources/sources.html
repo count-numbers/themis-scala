@@ -92,3 +92,18 @@
 		Save configuration
 	</button>
 <div>
+
+
+<h1>Ingestion Log</h1>
+<table class="logtable">
+	<tbody>
+		<tr ng-repeat="log in ingestionLog" class="{{log.level}}">
+			<td class="timestamp">{{log.timestamp | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+			<td>{{log.level}}</td>
+			<td>{{log.sourceId}}</td>
+			<td><dms-document doc-id="log.docId" name="log.docId"/></td>
+			<td>{{log.username}}</td>
+			<td>{{log.text}}</td>
+		</tr>
+	</tbody>
+</table>

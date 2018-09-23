@@ -9,7 +9,7 @@ angular.module('dms.sources', ['ngRoute'])
   });
 }])
 
-.controller('SourcesCtrl', function($scope, Configuration, DocumentSources, $location, GDrive, Errors) {
+.controller('SourcesCtrl', function($scope, Configuration, DocumentSources, $location, GDrive, IngestionLog, Errors) {
 
 	$scope.googleOAuthURL  = Configuration.backendURL + "google/oauthstart"
   	$scope.googleRevokeURL = Configuration.backendURL + "google/oauthrevoke"
@@ -38,4 +38,17 @@ angular.module('dms.sources', ['ngRoute'])
             console.log("Executing source "+id);
             DocumentSources.execute({id:id});
     }
+
+    $scope.loadingIngestionLog = true;
+    $scope.ingestionLog = IngestionLog.query({},
+                function() {
+                    $scope.loadingIngestionLog = false;
+                },
+                function($error) {
+                    $scope.error = true;
+                    $scope.loadingIngestionLog = false;
+                    Errors.add($error);
+                }
+    );
+
 });

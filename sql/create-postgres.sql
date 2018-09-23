@@ -111,6 +111,16 @@ CREATE TABLE source (
     "fileSourceFolder" VARCHAR
 );
 
+CREATE TABLE ingestion_log (
+    id SERIAL PRIMARY KEY,
+    level VARCHAR NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
+    "docId" INT,
+    "srcId" INT,
+    "userName" VARCHAR,
+    text VARCHAR NOT NULL
+);
+
 -- Fulltext setup. Create trigger to concatenate name and description into fulltext column and create index
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
 ON document FOR EACH ROW EXECUTE PROCEDURE

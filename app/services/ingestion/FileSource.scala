@@ -4,7 +4,7 @@ import java.io.IOException
 import java.nio.file.{Files, Path}
 
 import actions.DocumentActions
-import db.ContactRepository
+import db.{ContactRepository, IngestionLogRepository}
 import play.api.{Configuration, Logger}
 import services.contentextraction.ContentExtractorService
 import services.thumbnail.ThumbnailService
@@ -13,7 +13,8 @@ import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success, Try}
 
 /** Imports files from a given fixed source folder. */
-class FileSource( username: String,
+class FileSource( id: Int,
+                  username: String,
                   sourceDir: Path,
                   config: Configuration,
                   documentActions: DocumentActions,
@@ -21,8 +22,9 @@ class FileSource( username: String,
                   contentExtractorService: ContentExtractorService,
                   contactRepository: ContactRepository,
                   ingestionNotifier: IngestionNotifier,
+                  ingestionLogRepository: IngestionLogRepository,
                   executionContext: ExecutionContext)
-  extends DocumentSource[Path]("file", username, config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, executionContext) {
+  extends DocumentSource[Path](id,"file", username, config, documentActions, thumbnailService, contentExtractorService, contactRepository, ingestionNotifier, ingestionLogRepository, executionContext) {
 
   import scala.collection.JavaConverters._
 

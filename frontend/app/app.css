@@ -201,3 +201,27 @@ body {
 .document-list time {
     color:#888;
 }
+
+
+.logtable {
+    width:100%;
+}
+.logtable tr td {
+    padding-left:1ex;
+    padding-right:1ex;
+    padding-top:0.5ex;
+    padding-bottom:0.5ex;
+}
+.logtable .timestamp {
+    white-space:nowrap;
+}
+.logtable tbody tr:nth-child(odd) {
+    background-color:#ddd;
+}
+
+.logtable tbody tr:nth-child(odd).warn {
+    background-color:#faa;
+}
+.logtable tbody tr:nth-child(even).warn {
+    background-color:#fcc;
+}

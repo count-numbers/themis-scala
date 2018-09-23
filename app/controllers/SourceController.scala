@@ -1,5 +1,6 @@
 package controllers
 
+import actions.IngestionActions
 import auth.{AuthAction, AuthorizedRequest}
 import db.{SourceRepository, Tables}
 import javax.inject.{Inject, Singleton}
@@ -7,7 +8,6 @@ import models.DocumentSource
 import play.api.libs.json.Json
 import play.api.mvc.Controller
 import play.api.{Configuration, Logger}
-import services.ingestion.IngestionServiceRunner
 import util.ErrorResponse
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SourceController @Inject()(val sourceRepository: SourceRepository,
                                  val config: Configuration,
-                                 val ingestionServiceRunner: IngestionServiceRunner,
+                                 val ingestionActions: IngestionActions,
                                  implicit val exec: ExecutionContext) extends Controller {
 
   def getMine() = AuthAction().async {
@@ -64,7 +64,7 @@ class SourceController @Inject()(val sourceRepository: SourceRepository,
   def execute(id: Int) = AuthAction().async {
     implicit request => {
       Logger.info(s"Executing source ${id}.")
-      ingestionServiceRunner.runSingle(id)
+      ingestionActions.runSingle(id)
       Future{NoContent}
     }
   }
