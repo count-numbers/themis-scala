@@ -1,14 +1,11 @@
 package db
 
-import javax.inject.{Inject, Singleton}
-
 import db.Tables._
 import db.Tables.profile.api._
-import models.{Comment, Contact}
+import javax.inject.{Inject, Singleton}
+import models.Contact
 import play.api.db.slick.DatabaseConfigProvider
 import slick.backend.DatabaseConfig
-import slick.dbio.DBIOAction
-import slick.dbio.Effect.{Read, Write}
 import slick.driver.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,7 +23,7 @@ class ContactRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider, 
     dbConfig.db
       .run(q.result)
       .map(_.headOption)
-      .map(_.map(Contact.of(_)))
+      .map(_.map(Contact.of))
   }
 
   def save(contact: Contact, id: Int): Future[Boolean] = {
@@ -36,15 +33,20 @@ class ContactRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider, 
 
   def saveNew(contact: Contact): Future[Contact] = {
     val action = (Tables.Contact returning Tables.Contact) += toRow(contact).copy(id = -1)
-    dbConfig.db.run(action).map(Contact.of(_))
+    dbConfig.db.run(action).map(Contact.of)
   }
 
   def search(searchTerm: String, offset: Int, limit: Int): Future[Seq[Contact]] = {
     val searchExpression =s"%${searchTerm}%"
-    val q = Tables.Contact.filter(_.name like searchExpression).drop(offset).take(limit)
+    val q =
+      (if (searchTerm == "")
+        Tables.Contact
+      else
+        Tables.Contact.filter(_.name like searchExpression))
+      .drop(offset).take(limit)
     dbConfig.db
       .run(q.result)
-      .map(_.map(Contact.of(_)))
+      .map(_.map(Contact.of))
   }
 
   def keywords: Future[Seq[(Int, String)]] = {

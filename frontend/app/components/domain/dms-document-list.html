@@ -13,14 +13,14 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="document in documents">
+		<tr ng-repeat="document in documents" class="document-list">
 			<td><span ng-show="document.actionRequired"
 				class="glyphicon glyphicon-exclamation-sign"></span> <span
 				ng-hide="document.archivingComplete"
 				class="glyphicon glyphicon-question-sign"></span>
 			</td>
 			<td>
-				<dms-document doc-id="document.id" name="document.name"></dms-document>
+				<dms-document doc-id="document.id" name="document.name"></dms-document><time>&nbsp;&mdash;&nbsp;{{document.archiveTimestamp | date:'short'}}</time>
 				<div class="document-description">
 					{{document.description}}
 				</div>

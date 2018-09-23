@@ -197,3 +197,7 @@ body {
 .slide-in.ng-leave.ng-leave-active {
   max-height:0px;
 }
+
+.document-list time {
+    color:#888;
+}
