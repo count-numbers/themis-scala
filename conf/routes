@@ -51,6 +51,9 @@ POST    /rest/v1/source/:id                             controllers.SourceContro
 DELETE  /rest/v1/source/:id                             controllers.SourceController.delete(id: Int)
 POST    /rest/v1/source/:id/execution                   controllers.SourceController.execute(id: Int)
 
+# Ingestion logs
+GET     /rest/v1/ingestion-log                          controllers.IngestionLogController.latest
+
 # Google OAuth flow
 GET     /google/oauthstart                      controllers.google.OAuthController.oauthStart()
 GET     /google/oauthreturn                     controllers.google.OAuthController.oauthReturn(code: Option[String])

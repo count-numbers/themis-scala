@@ -78,7 +78,7 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
         case Some(contact: Contact) =>
           withDocAndUser(docId, username,
             _ => documentRepository.setContact(docId, Some(contactId)).map((_, Unit)),
-            ActivityType.SetContact, Seq(contact.name))
+            ActivityType.SetContact, Seq(contact.id.map(_.toString).getOrElse(""), contact.name))
             .map(_.map(_._1))
       }
     } yield docOpt
