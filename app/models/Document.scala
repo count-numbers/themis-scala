@@ -22,6 +22,7 @@ case class Document(id: Int,
 
                     sourceId: String,
                     sourceReference: String,
+                    thumbnailId: Option[Int],
 
                     tags: Option[Seq[String]] = None,
 
@@ -61,7 +62,8 @@ object Document {
     actionRequired =  doc.actionrequired,
 
     sourceId = doc.sourceid,
-    sourceReference = doc.sourcereference)
+    sourceReference = doc.sourcereference,
+    thumbnailId = doc.thumbnailid)
 
   // implicit val formatDocument = Json.format[Document]
   // implicit val readsDocument = Json.reads[Document]

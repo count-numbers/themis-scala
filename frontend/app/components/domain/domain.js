@@ -52,6 +52,14 @@ angular.module('dms.dmsDomain', [])
 		      documents: '='
 		},
 	};
+}).directive('dmsDocumentListWithActions', function() {
+	return {
+		templateUrl: 'components/domain/dms-document-list-with-actions.html',
+		restrict: 'E',
+		scope: {
+		      documents: '='
+		},
+	};
 }).directive('dmsLoading', function() {
 	return {
 		templateUrl: 'components/domain/dms-loading.html',

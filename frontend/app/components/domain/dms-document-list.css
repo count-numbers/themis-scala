@@ -1,5 +1,5 @@
 /* documents list page */
-.table .document-description {
+.document-list .document-description {
 	font-style: italic;
 	max-height: 50px;
 
@@ -11,6 +11,6 @@
 	text-overflow: ellipsis;
 }
 
-.table .user {
+.document-list .user {
 	white-space: nowrap;
 }

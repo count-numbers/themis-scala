@@ -64,6 +64,7 @@ module.exports = function(grunt) {
     		      'app/document/document.css',
     		      'login/login.css',
     		      'app/components/domain/dms-document-list.css',
+    		      'app/components/domain/dms-document-list-with-actions.css',
     		      'app/components/domain/dms-editable-markup.css',
     		      'app/components/domain/dms-contact.css'
     		],

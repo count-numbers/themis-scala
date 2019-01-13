@@ -1,0 +1,36 @@
+<table class="table document-list-comfy">
+	<tbody>
+		<tr ng-repeat="document in documents">
+			<td>
+				<span class="thumb-with-icons">
+					<img
+							ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + document.thumbnailId + '/thumbnail'}}"
+							alt="{{attachment.name}}" class="thumbnail"/>
+					<span class="badge-over-thumb">
+						<span ng-show="document.actionRequired" class="glyphicon glyphicon-exclamation-sign action-required"></span>
+						<span ng-hide="document.archivingComplete" class="glyphicon glyphicon-question-sign archiving-incomplete"></span>
+					</span>
+				</span>
+
+			</td>
+			<td>
+				<h3>
+					<dms-document doc-id="document.id" name="document.name"></dms-document>
+				</h3>
+				<div>
+					<span class="glyphicon glyphicon-time"></span>
+					<time>{{document.archiveTimestamp | date:'yyyy-MM-dd HH:mm'}}</time>
+					<span class="glyphicon glyphicon-user"></span>
+					<dms-user user-id="document.owner.id" name="document.owner.name"></dms-user>
+				</div>
+				<div class="document-description">
+					{{document.description}}
+				</div>
+				<div>
+					<span ng-repeat="tag in document.tags" class="label label-default skip-right-related">{{tag}}</span>
+				</div>
+
+			</td>
+		</tr>
+	</tbody>
+</table>

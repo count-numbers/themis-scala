@@ -1,6 +1,8 @@
 /* editable markup */
 .editable, .editable-markup .showing {
-	cursor: pointer;	
+	cursor: pointer;
+	max-height:400px;
+	overflow:scroll;
 }
 
 .editable-markup textarea {

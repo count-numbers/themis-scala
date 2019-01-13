@@ -80,11 +80,14 @@ CREATE TABLE link (
 
 CREATE TABLE attachment (
     id SERIAL PRIMARY KEY,
-    docId INT NOT NULL,
+    docId INT REFERENCES document(id) NOT NULL,
     name VARCHAR NOT NULL,
     size BIGINT NOT NULL,
     mimeType VARCHAR NOT NULL
 );
+
+ALTER TABLE document
+ADD COLUMN thumbnailId INT REFERENCES attachment(id),
 
 CREATE TABLE activity (
     id SERIAL PRIMARY KEY,
