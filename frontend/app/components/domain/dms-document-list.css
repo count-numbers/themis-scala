@@ -1,16 +1,18 @@
 /* documents list page */
-.document-list .document-description {
-	font-style: italic;
-	max-height: 50px;
+.document-list {
+    .document-description {
+        font-style: italic;
+        max-height: 50px;
 
-	display: -webkit-box;
-  	-webkit-line-clamp: 2;
-  	-webkit-box-orient: vertical;
-  
-	overflow: hidden;
-	text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .user {
+        white-space: nowrap;
+    }
 }
 
-.document-list .user {
-	white-space: nowrap;
-}

@@ -1,0 +1,59 @@
+.thumb-with-icons {
+    position:relative;
+    padding-top:20px;
+    display:inline-block;
+}
+
+.badge-over-thumb {
+    position: absolute;
+    right:-10px;
+    top:10px;
+    text-align: center;
+    color:#green;
+    padding:0;
+    font-size:20px;
+    max-width:32px;
+    text-align:right;
+
+    .glyphicon {
+        font-size:larger;
+        border:3px solid white;
+        border-radius:50%;
+        color:#888;
+    }
+
+    .glyphicon.action-required {
+        color: #d9534f;
+    }
+    .glyphicon.archiving-incomplete{
+        color: #f0ad4e;
+    }
+}
+
+/* documents list page */
+table.document-list-comfy {
+    > tbody > tr > td {
+        padding-left:5ex;
+    }
+
+    .document-description {
+        font-style: italic;
+        max-height: 50px;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user {
+        white-space: nowrap;
+    }
+
+    .document-description {
+        margin-top: 1ex;
+        margin-bottom: 1ex;
+    }
+}

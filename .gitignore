@@ -9,3 +9,4 @@ public
 /.settings
 /RUNNING_PID
 conf/application-local.conf
+.sass-cache

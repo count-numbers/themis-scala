@@ -16,12 +16,11 @@ module.exports = function(grunt) {
     	},
     	css: {
     		files: [
-    		   'app/*.css',
-    		   'app/components/**/*.css',
- 		       'app/document/document.css',
- 		       'app/login/login.css'
+    		   'app/**/*.css',
+    		   'app/**/*.scss',
+    		   '!app/bower_components/**/*'
     		],
-    		tasks: ['concat', 'uglify']
+    		tasks: ['concat', 'uglify', 'sass']
     	},
   		html: {
   			files: [
@@ -59,16 +58,13 @@ module.exports = function(grunt) {
     	},
     	css: {
     		src: [
-    		      'app/app.css',
-    		      'app/timeline.css',
-    		      'app/document/document.css',
-    		      'login/login.css',
-    		      'app/components/domain/dms-document-list.css',
-    		      'app/components/domain/dms-document-list-with-actions.css',
-    		      'app/components/domain/dms-editable-markup.css',
-    		      'app/components/domain/dms-contact.css'
+
+            	  'app/**/*.css',
+            	  'app/**/*.scss',
+            	  '!app/bower_components/**/*.css',
+            	  '!app/bower_components/**/*.scss',
     		],
-    		dest: '../public/css/<%= pkg.name %>.css'
+    		dest: '../public/css/<%= pkg.name %>.scss'
     	},
     	libraries: {
     		separator : ';',
@@ -120,7 +116,18 @@ module.exports = function(grunt) {
         dest: '../public/<%= pkg.name %>.min.js'
       }
     },
-    
+
+    sass: {
+        dist: {
+          options: {
+            style: 'expanded'
+          },
+          files: {
+            '../public/css/<%= pkg.name %>.css': '../public/css/<%= pkg.name %>.scss'
+          }
+        }
+    },
+
     copy: {
     	html: {
     		expand: true,
@@ -188,15 +195,16 @@ module.exports = function(grunt) {
     }
   });
 
-  // Load the plugin that provides the "uglify" task.
+
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-sass');
 
   // Default task(s).
-  grunt.registerTask('default', ['concat', 'uglify', 'copy']);
+  grunt.registerTask('default', ['concat', 'uglify', 'copy', 'sass']);
 
 };
