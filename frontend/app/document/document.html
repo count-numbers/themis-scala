@@ -50,8 +50,44 @@
                     <dms-loading-indicator loading="submittingDescription"></dms-loading-indicator>
                 </h4>
 
-                <dms-editable-markup value="{{document.description}}"
-                                     submit="submitDescription(value)"></dms-editable-markup>
+                <div ng-if="currentAttachment == null">
+                    <dms-editable-markup value="{{document.description}}"
+                                         submit="submitDescription(value)"></dms-editable-markup>
+                </div>
+                <img ng-if="currentAttachment != null"
+                        ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/thumbnail'}}"
+                        alt="{{currentAttachment.name}}"
+                        class="preview">
+
+                <div class="preview-tabs">
+                    <span ng-repeat="attachment in document.attachments | orderBy : 'name'"
+                         class="preview-tab">
+                        <div class="thumbnail">
+                            <a ng-click="showPreview(attachment)">
+                                <img ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + attachment.id + '/thumbnail'}}"
+                                     alt="{{attachment.name}}" />
+                            </a>
+                            <a href="{{configuration.backendURL + 'rest/v1/attachment/' + attachment.id + '/body'}}">
+                                <div class="caption">
+                                    <div>
+                                        <span class="glyphicon glyphicon-download"></span>
+                                        <span class="attachment-name"> {{attachment.name}} </span>
+                                        ({{attachment.size}} bytes)
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </span>
+
+                    <a class="preview-tab" ng-click="showTextPreview()">
+                        <div class="thumbnail-text">
+                            <div>
+                            <div class="thumbnail-icon"><span class="glyphicon glyphicon-book"></span></div>
+                            <div>Text preview</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -180,27 +216,6 @@
     </div>
 
     <hr clear="all"/>
-    <h3>Files</h3>
-    <div class="row">
-        <div ng-repeat="attachment in document.attachments | orderBy : 'name'"
-             class="col-xs-6 col-md-3">
-            <div class="thumbnail">
-                <a
-                        href="{{configuration.backendURL + 'rest/v1/attachment/' + attachment.id + '/body'}}">
-                    <img
-                            ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + attachment.id + '/thumbnail'}}"
-                            alt="{{attachment.name}}">
-                    <div class="caption">
-                        <div>
-                            <span class="glyphicon glyphicon-download"></span> <span
-                                class="attachment-name"> {{attachment.name}} </span>
-                            ({{attachment.size}} bytes)
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
 
     <hr/>
     <h3>Comments and activity</h3>

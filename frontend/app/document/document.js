@@ -15,8 +15,14 @@ angular.module('dms.document', ['ngRoute'])
 
 	$scope.documentUpdated = function() {
 		$scope.activityWithComments = $scope.document.activityHistory.concat($scope.document.comments);
+		if ($scope.document.attachments.length > 0) {
+		    $scope.currentAttachment = $scope.document.attachments[0];
+		} else {
+		    $scope.currentAttachment = null;
+		}
 	}
-	
+
+	$scope.currentAttachment = null;
 	$scope.document = Document.get({docId:$routeParams.docid}, 
 			function() { // success 
 				$scope.loading = false;
@@ -28,6 +34,15 @@ angular.module('dms.document', ['ngRoute'])
 				$scope.loading = false;
 			}
 	);	
+
+    $scope.showPreview = function(attachment) {
+        $scope.currentAttachment = attachment;
+        console.log("CA:"+$scope.currentAttachment);
+    }
+    $scope.showTextPreview = function() {
+        $scope.currentAttachment = null;
+        console.log("CA:"+$scope.currentAttachment);
+    }
 
 	$scope.loadTags = function(query) {
         return Tag.query({q: query}).$promise;
