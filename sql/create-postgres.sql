@@ -1,14 +1,15 @@
-DROP TABLE "source";
-DROP TABLE tagging;
-DROP TABLE dtag;
-DROP TABLE comment;
-DROP TABLE link;
-DROP TABLE attachment;
-DROP TABLE activity;
-DROP TABLE document;
-DROP TABLE "user";
-DROP TABLE contact;
-DROP TABLE "config";
+DROP TABLE "source" cascade;
+DROP TABLE tagging cascade;
+DROP TABLE dtag cascade;
+DROP TABLE comment cascade;
+DROP TABLE link cascade;
+DROP TABLE attachment cascade;
+DROP TABLE activity cascade;
+DROP TABLE document cascade;
+DROP TABLE "user" cascade;
+DROP TABLE contact cascade;
+DROP TABLE "config" cascade;
+DROP TABLE "ingestion_log" cascade;
 
 CREATE TABLE "user" (
    id SERIAL PRIMARY KEY,
@@ -87,7 +88,7 @@ CREATE TABLE attachment (
 );
 
 ALTER TABLE document
-ADD COLUMN thumbnailId INT REFERENCES attachment(id),
+ADD COLUMN thumbnailId INT REFERENCES attachment(id);
 
 CREATE TABLE activity (
     id SERIAL PRIMARY KEY,

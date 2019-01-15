@@ -1,6 +1,6 @@
 <dms-loading loading="loading"></dms-loading>
 
-<div ng-show="documentComplete">
+<div ng-show="documentComplete" class="document">
 
     <div>
         <button ng-hide="document.archivingComplete" type="button" class="btn btn-danger"
@@ -45,7 +45,7 @@
 
     <div class="row">
         <div class="col-sm-8">
-            <div class="bs-callout bs-callout-info">
+            <div class="document-main">
                 <h4>
                     <dms-loading-indicator loading="submittingDescription"></dms-loading-indicator>
                 </h4>
@@ -58,32 +58,36 @@
                         ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/thumbnail'}}"
                         alt="{{currentAttachment.name}}"
                         class="preview">
+                <a href="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/body'}}">
+                    <div class="caption">
+                        <div>
+                            <span class="glyphicon glyphicon-download"></span>
+                            <span class="attachment-name"> {{currentAttachment.name}} </span>
+                            ({{currentAttachment.size}} bytes)
+                        </div>
+                    </div>
+                </a>
+
 
                 <div class="preview-tabs">
                     <span ng-repeat="attachment in document.attachments | orderBy : 'name'"
-                         class="preview-tab">
-                        <div class="thumbnail">
+                         class="preview-tab {{(currentAttachment.id == attachment.id) ? 'active' : ''}}">
+                        <div class="preview-thumbnail">
                             <a ng-click="showPreview(attachment)">
                                 <img ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + attachment.id + '/thumbnail'}}"
                                      alt="{{attachment.name}}" />
                             </a>
-                            <a href="{{configuration.backendURL + 'rest/v1/attachment/' + attachment.id + '/body'}}">
-                                <div class="caption">
-                                    <div>
-                                        <span class="glyphicon glyphicon-download"></span>
-                                        <span class="attachment-name"> {{attachment.name}} </span>
-                                        ({{attachment.size}} bytes)
-                                    </div>
-                                </div>
-                            </a>
+                            <div class="caption">{{attachment.name}}</div>
                         </div>
                     </span>
 
-                    <a class="preview-tab" ng-click="showTextPreview()">
+                    <a class="preview-tab {{(currentAttachment == null) ? 'active' : ''}}" ng-click="showTextPreview()">
                         <div class="thumbnail-text">
                             <div>
-                            <div class="thumbnail-icon"><span class="glyphicon glyphicon-book"></span></div>
-                            <div>Text preview</div>
+                            <div class="thumbnail-icon">
+                                <span class="glyphicon glyphicon-book"></span>
+                            </div>
+                            <div class="caption">Extracted text</div>
                             </div>
                         </div>
                     </a>
@@ -93,7 +97,7 @@
 
         <div class="col-sm-4 vr-left">
 
-            <div class="bs-callout bs-callout-info">
+            <div class="document-margin">
 
                 <h4>Contact</h4>
 

@@ -283,6 +283,12 @@ class DocumentRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider,
   }
 
   /** Updates the name of the document with the given ID. Returns false if it does not exist. */
+  def setThumbnailIdIfUnset(docId: Int, thumbnailId: Int): Future[Boolean] = {
+    val updateAction = Tables.Document.filter(row => row.id === docId && row.thumbnailid.isEmpty).map(_.thumbnailid).update(Some(thumbnailId))
+    dbConfig.db.run(updateAction).map(_ == 1)
+  }
+
+  /** Updates the name of the document with the given ID. Returns false if it does not exist. */
   def setContact(docId: Int, contactId: Option[Int]): Future[Boolean] = {
     val updateAction = Tables.Document.filter(_.id === docId).map(_.contact).update(contactId)
     dbConfig.db.run(updateAction).map(_ == 1)

@@ -37,4 +37,9 @@ class UserRepository @Inject()(val dbConfigProvider: DatabaseConfigProvider, imp
           yield User.of(row)
       }
   }
+
+  def save(user: User, password: String): Future[_root_.db.Tables.UserRow] = {
+    val action = (db.Tables.User returning db.Tables.User) += UserRow(id = -1, username = user.username, password = password, name = user.name, email = user.email)
+    dbConfig.db.run(action)
+  }
 }

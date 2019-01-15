@@ -24,10 +24,10 @@ angular.module('dms.sources', ['ngRoute'])
         if (src.id) src.$remove();
     }
     $scope.addFileSource = function() {
-        $scope.sources.push({type:"file"});
+        $scope.sources.push({type:"file", active:false});
     }
     $scope.addGDriveSource = function() {
-        $scope.sources.push({type:"gdrive", gdriveSourceFolderId: "root", gdriveArchiveFolderId: "root"});
+        $scope.sources.push({type:"gdrive", gdriveSourceFolderId: "root", gdriveArchiveFolderId: "root", active:false});
     }
     $scope.save = function() {
         $scope.sources.forEach(function(src) {

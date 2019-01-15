@@ -43,11 +43,15 @@ class FileSource( id: Int,
   override def importToTemp(incomingFile: Path): Try[Path] = {
     try {
       val name = incomingFile.getName(incomingFile.getNameCount-1).toString
-      val file: Path = Files.move(incomingFile, tempDir.resolve(name))
-      Logger.info(s"Moving incoming ${incomingFile} to ${file}.")
+      val target = tempDir.resolve(name)
+      Logger.info(s"Moving incoming ${incomingFile} to ${target}.")
+      val file: Path = Files.move(incomingFile, target)
       Success(file)
     } catch {
-      case ex:IOException => Failure(ex)
+       case ex:IOException => {
+         Logger.info(s"Failed to move file: ${ex}")
+         Failure(ex)
+       }
     }
   }
 }

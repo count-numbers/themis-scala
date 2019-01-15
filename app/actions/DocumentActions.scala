@@ -98,9 +98,22 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
       .map(_.map(_._2))
   }
 
+  /** Adds the named attachment to the document with the given ID. If this document has no
+    * default thumbnail ID defined, we will also set the ID assigned to this attachment
+    * as the default for this document. */
   def addAttachment(docId: Int, name: String, size: Long, mimeType: String, username: String): Future[Option[Int]] = {
+    // insert attachment for this doc id (including activity)
     withDocAndUser(docId, username,
-      _ => attachmentRepository.persist(docId, name, size, mimeType).map((attachmentId: Int) => (true, attachmentId)),
+      Unit => {
+        for {
+          // insert thumbnail with FK to document first
+          attachmentId: Int <- attachmentRepository.persist(docId, name, size, mimeType) //.map((attachmentId: Int) => (true, attachmentId))
+          // then, given the attachment id, set the new attachment as a default for the document, if it is the first.
+          docId: Boolean <- documentRepository.setThumbnailIdIfUnset(docId, attachmentId)
+        } yield {
+          (true, attachmentId)
+        }
+      },
       ActivityType.Attached, Seq(name))
       .map(_.map(_._2))
   }
