@@ -53,4 +53,5 @@ object ActivityType extends Enumeration {
   val MarkedActionRequired = Value("MARKED_ACTION_REQUIRED")
   val SetFollowup = Value("SET_FOLLOWUP")
   val FollowupExpired = Value("FOLLOWUP_EXPIRED")
+  val AssignedDocumentDate = Value("ASSIGNED_DOCUMENT_DATE")
 }

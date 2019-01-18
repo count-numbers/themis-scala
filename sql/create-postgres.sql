@@ -42,6 +42,7 @@ CREATE TABLE document (
    contact INT REFERENCES contact(id),
    archiveTimestamp TIMESTAMP NOT NULL,
    modificationTimestamp TIMESTAMP NOT NULL,
+   documentDate DATE,
    followUpTimestamp TIMESTAMP,
 
    sourceId VARCHAR NOT NULL,

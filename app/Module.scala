@@ -25,7 +25,6 @@ class Module extends AbstractModule with AkkaGuiceSupport {
 
     bindActor[IngestionServiceActor]("ingestion-actor")
     bind(classOf[IngestionService]).asEagerSingleton()
-
   }
 
 }

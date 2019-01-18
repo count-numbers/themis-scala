@@ -30,7 +30,7 @@ public class PDFThumbnailExtractor implements ThumbnailExtractor {
 		return COMPATIBLE_CONTENT_TYPES;
 	}
 
-	public void extractFromFile(Path srcPath, Path thumbPath) throws IOException {
+	public void extractFromFile(Path srcPath, Path thumbPath, int maxWidth, int maxHeight) throws IOException {
 		try (RandomAccessFile raf = new RandomAccessFile (srcPath.toFile(), "r")) {
 			FileChannel fc = raf.getChannel ();
 			ByteBuffer buf = fc.map (FileChannel.MapMode.READ_ONLY, 0, fc.size ());
@@ -45,8 +45,8 @@ public class PDFThumbnailExtractor implements ThumbnailExtractor {
 			}
 
 			double aspectRatio = page.getWidth() / page.getHeight();
-			double imgWidth = THUMBNAIL_SIZE;
-			double imgHeight = THUMBNAIL_SIZE;
+			double imgWidth = maxWidth;
+			double imgHeight = maxHeight;
 			if (aspectRatio > 1) { // portrait
 				imgHeight = imgWidth / aspectRatio;
 			} else {

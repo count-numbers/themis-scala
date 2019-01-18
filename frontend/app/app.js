@@ -17,7 +17,6 @@ angular.module('dms', [
   'dms.login',
   'dms.profile',
   'dms.sources',
-  'dms.admin',
   'dms.trello',
   'dms.gdrive',
   'dms.auth',

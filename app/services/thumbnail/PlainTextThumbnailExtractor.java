@@ -20,13 +20,13 @@ public class PlainTextThumbnailExtractor implements ThumbnailExtractor {
 	public static String[] COMPATIBLE_CONTENT_TYPES = { "text/plain", "text/xml", "application/xml", "text/" };
 
 	@Override
-	public void extractFromFile(Path srcPath, Path thumbPath) throws IOException {
-		BufferedImage img = new BufferedImage(THUMBNAIL_SIZE, THUMBNAIL_SIZE, BufferedImage.TYPE_INT_RGB);
+	public void extractFromFile(Path srcPath, Path thumbPath, int maxWidth, int maxHeight) throws IOException {
+		BufferedImage img = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = img.createGraphics();
 		g.setRenderingHints(ThumbnailUtils.HQ_RENDERING_HINTS);
 		// fill with white
 		g.setColor(Color.WHITE);
-		g.fillRect(0,  0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+		g.fillRect(0,  0, maxWidth, maxHeight);
 		
 		Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 8);
 		g.setFont(font);

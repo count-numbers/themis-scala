@@ -15,6 +15,10 @@ import util.{ErrorResponse, FileSystemUtils}
 
 import scala.concurrent.ExecutionContext
 
+sealed abstract class DisplayableAttachmentType(val width: Int, val height: Int)
+case object TypeThumbnail extends DisplayableAttachmentType(200, 200)
+case object TypePreview extends DisplayableAttachmentType(800, 800)
+
 /**
   * Created by simfischer on 3/12/17.
   */
@@ -22,6 +26,8 @@ import scala.concurrent.ExecutionContext
 class AttachmentController @Inject()(attachmentRepository: AttachmentRepository,
                                      implicit val config: Configuration,
                                      implicit val exec: ExecutionContext) extends Controller {
+
+
 
   def download(id: Int) = AuthAction().async {
     request => {
@@ -46,7 +52,15 @@ class AttachmentController @Inject()(attachmentRepository: AttachmentRepository,
     }
   }
 
-  def thumbnail(id: Int) = AuthAction().async {
+  def thumbnail(id: Int) = {
+    thumbnailOrPreview(id, TypeThumbnail)
+  }
+
+  def preview(id: Int) = {
+    thumbnailOrPreview(id, TypePreview)
+  }
+
+  def thumbnailOrPreview(id: Int, daType: DisplayableAttachmentType) = AuthAction().async {
     // TODO: Fallback for not-generated thumbnail (due to unknown file format)
     request => {
       for {
@@ -54,7 +68,10 @@ class AttachmentController @Inject()(attachmentRepository: AttachmentRepository,
       } yield {
         attachment match {
           case Some(attachment: Attachment) => {
-            val pathOpt: Option[Path] = FileSystemUtils.thumbnailPath(attachment.id)
+            val pathOpt: Option[Path] = daType match {
+              case TypeThumbnail => FileSystemUtils.thumbnailPath(attachment.id)
+              case TypePreview => FileSystemUtils.previewPath(attachment.id)
+            }
             pathOpt.map((path: Path) => {
               val source: Source[ByteString, _] = FileIO.fromPath(path)
               if (Files.exists(path)) {
@@ -64,11 +81,12 @@ class AttachmentController @Inject()(attachmentRepository: AttachmentRepository,
                   body = HttpEntity.Streamed(source, Some(Files.size(path)), Some("image/png"))
                 )
               } else {
-                NotFound(ErrorResponse(404, "Not found", s"Thumbnail not generated for ${id}"))
+                TemporaryRedirect(s"/static/img/unavailable-${daType.width}.png")
+                //NotFound(ErrorResponse(404, "Not found", s"Thumbnail not generated for ${id}"))
               }
-            }).getOrElse(NotFound(ErrorResponse(404, "Not found", s"Thumbnail file not found for ${id}")))
+            }).getOrElse(TemporaryRedirect("/static/img/unavailable-${daType.width}.png")) //NotFound(ErrorResponse(404, "Not found", s"Thumbnail file not found for ${id}")))
           }
-          case _ => NotFound(ErrorResponse(404, "Not found", s"No such thumbnail ${id}"))
+          case _ => TemporaryRedirect("/static/img/unavailable-${daType.width}.png") //NotFound(ErrorResponse(404, "Not found", s"No such thumbnail ${id}"))
         }
       }
     }

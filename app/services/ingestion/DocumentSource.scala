@@ -33,6 +33,9 @@ abstract class DocumentSource[T](val id: Int,
                                  ingestionLogRepository: IngestionLogRepository,
                                  implicit val executionContext: ExecutionContext) {
 
+  val THUMBNAIL_SIZE=200;
+  val PREVIEW_SIZE=800;
+
   val destinationDir: Path = Paths.get(config.getString("themis.storage.dir").get)
   val tempDir: Path = Paths.get(config.getString("themis.temp.dir").get)
 
@@ -100,7 +103,8 @@ abstract class DocumentSource[T](val id: Int,
               Logger.info(s"Ingested ${file} to ${dest}.")
               ingestionLogRepository.info(s"Ingested ${file} to ${dest}.", Some(DocumentSource.this.id), Some(username), Some(docId))
               for (thumbnailExtractor <- thumbnailService.forMimetype(mimeType)) {
-                thumbnailExtractor.extractFromFile(dest, destinationDir.resolve(s"${id}.thumb"))
+                thumbnailExtractor.extractFromFile(dest, destinationDir.resolve(s"${id}.thumb"), THUMBNAIL_SIZE, THUMBNAIL_SIZE)
+                thumbnailExtractor.extractFromFile(dest, destinationDir.resolve(s"${id}.preview"), PREVIEW_SIZE, PREVIEW_SIZE)
               }
             }
             //ingestionNotifier.notify(docId)

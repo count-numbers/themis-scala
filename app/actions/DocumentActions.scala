@@ -34,6 +34,13 @@ case class DocumentActions @Inject()(val documentRepository: DocumentRepository,
       .map(_.map(_._1))
   }
 
+  def setDocumentDate(docId: Int, documentDate: Option[String], username: String): Future[Option[Document]] = {
+    withDocAndUser(docId, username,
+      _ => documentRepository.setDocumentDate(docId, documentDate).map((_, Unit)),
+      ActivityType.AssignedDocumentDate, Seq(documentDate.getOrElse("[none]")))
+      .map(_.map(_._1))
+  }
+
   def markActionRequired(docId: Int, actionRequired: Boolean, username: String): Future[Option[Document]] = {
     withDocAndUser(docId, username,
       _ => documentRepository.setActionRequired(docId, actionRequired).map((_, Unit)),

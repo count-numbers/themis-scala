@@ -16,6 +16,7 @@ case class Document(id: Int,
                     archiveTimestamp: Long,
                     modificationTimestamp: Long,
                     followUpTimestamp: Option[Long],
+                    documentDate: Option[String],
 
                     archivingComplete: Boolean,
                     actionRequired: Boolean,
@@ -57,6 +58,7 @@ object Document {
     archiveTimestamp = doc.archivetimestamp.getTime,
     modificationTimestamp = doc.modificationtimestamp.getTime,
     followUpTimestamp = doc.followuptimestamp.map(_.getTime),
+    documentDate = doc.documentdate.map(_.toString),
 
     archivingComplete = doc.archivingcomplete,
     actionRequired =  doc.actionrequired,

@@ -55,7 +55,7 @@
                                          submit="submitDescription(value)"></dms-editable-markup>
                 </div>
                 <img ng-if="currentAttachment != null"
-                        ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/thumbnail'}}"
+                        ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/preview'}}"
                         alt="{{currentAttachment.name}}"
                         class="preview">
                 <a href="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/body'}}">
@@ -70,16 +70,15 @@
 
 
                 <div class="preview-tabs">
-                    <span ng-repeat="attachment in document.attachments | orderBy : 'name'"
-                         class="preview-tab {{(currentAttachment.id == attachment.id) ? 'active' : ''}}">
+                    <a ng-repeat="attachment in document.attachments | orderBy : 'name'"
+                         class="preview-tab {{(currentAttachment.id == attachment.id) ? 'active' : ''}}"
+                          ng-click="showPreview(attachment)">
                         <div class="preview-thumbnail">
-                            <a ng-click="showPreview(attachment)">
                                 <img ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + attachment.id + '/thumbnail'}}"
                                      alt="{{attachment.name}}" />
-                            </a>
                             <div class="caption">{{attachment.name}}</div>
                         </div>
-                    </span>
+                    </a>
 
                     <a class="preview-tab {{(currentAttachment == null) ? 'active' : ''}}" ng-click="showTextPreview()">
                         <div class="thumbnail-text">
@@ -142,6 +141,20 @@
                                 <td>{{document.archiveTimestamp | date:'yyyy-MM-dd HH:mm'}}</td>
                             </tr>
                             <tr>
+                                <td>Document date</td>
+                                <td>
+                                    <a href="#" editable-text="document.documentDate" onBeforeSave="setDocumentDate($data)">
+                                        {{ document.documentDate || "[none]" }}
+                                    </a>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Modified</td>
+                                <td>{{document.modificationTimestamp | date:'yyyy-MM-dd HH:mm'}}</td>
+                            </tr>
+
+                            <tr>
                                 <td>Importer</td>
                                 <td>
                                     <span ng-show="document.sourceId">
@@ -165,10 +178,6 @@
                                 </td>
                             </tr>
 
-                            <tr>
-                                <td>Modified</td>
-                                <td>{{document.modificationTimestamp | date:'yyyy-MM-dd HH:mm'}}</td>
-                            </tr>
                             <tr ng-show="document.followUpTimestamp">
                                 <td>Follow-up</td>
                                 <td>

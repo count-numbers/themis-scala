@@ -18,7 +18,8 @@ case class PatchableDocFields(name: Option[String],
                               description: Option[String],
                               archivingComplete: Option[Boolean],
                               actionRequired: Option[Boolean],
-                              followUpTimestamp: Option[String])
+                              followUpTimestamp: Option[String],
+                              documentDate: Option[String])
 object PatchableDocFields {
   implicit val readsPatchableDocFields = Json.reads[PatchableDocFields]
 }
@@ -135,13 +136,18 @@ class DocumentController @Inject()(val documentActions: DocumentActions,
     implicit request => {
       val patchedDoc = request.body.as[PatchableDocFields];
       val doc: Future[Option[Document]] = patchedDoc match {
-        case PatchableDocFields(Some(name), None, None, None, None) => documentActions.rename(id, name, request.username)
-        case PatchableDocFields(None, Some(description), None, None, None) => documentActions.setDescription(id, description, request.username)
-        case PatchableDocFields(None, None, Some(archivingComplete), None, None) => documentActions.markArchivingComplete(id, archivingComplete, request.username)
-        case PatchableDocFields(None, None, None, Some(actionRequired), None) => documentActions.markActionRequired(id, actionRequired, request.username)
-        case PatchableDocFields(None, None, None, None, Some(followUp)) => {
+        case PatchableDocFields(Some(name), None, None, None, None, None) => documentActions.rename(id, name, request.username)
+        case PatchableDocFields(None, Some(description), None, None, None, None) => documentActions.setDescription(id, description, request.username)
+        case PatchableDocFields(None, None, Some(archivingComplete), None, None, None) => documentActions.markArchivingComplete(id, archivingComplete, request.username)
+        case PatchableDocFields(None, None, None, Some(actionRequired), None, None) => documentActions.markActionRequired(id, actionRequired, request.username)
+        case PatchableDocFields(None, None, None, None, Some(followUp), None) => {
           val parsedFollowUp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(followUp)
           documentActions.setFollowup(id, Some(parsedFollowUp), request.username)
+        }
+        case PatchableDocFields(None, None, None, None, None, Some(documentDate)) => {
+          // field is nullable, so interpret empty string as null
+          val documentDateOpt: Option[String] = if (documentDate == "") None else Some(documentDate)
+          documentActions.setDocumentDate(id, documentDateOpt, request.username)
         }
         case _ => Promise[Option[Document]]().failure(new IllegalArgumentException("Exactly one field must be set")).future
       }

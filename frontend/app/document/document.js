@@ -9,7 +9,7 @@ angular.module('dms.document', ['ngRoute'])
   });
 }])
 
-.controller('DocumentCtrl', function($scope, $routeParams, Document, Contact, Tag, Errors, TrelloFacade) {	
+.controller('DocumentCtrl', function($scope, $routeParams, Document, Contact, Tag, Errors, TrelloFacade) {
 	$scope.loading = true;
 	$scope.documentComplete = false;
 
@@ -73,6 +73,17 @@ angular.module('dms.document', ['ngRoute'])
     			});
     	return true;
     };
+    $scope.setDocumentDate = function($data) {
+    	Document.update({id:$routeParams.docid, documentDate:$data},
+    			function(updatedDocument) {
+    				$scope.document = updatedDocument;
+    				$scope.documentUpdated();
+    			},
+    			function (response) {
+    				Errors.add(response);
+    			});
+    	return true;
+    }
 
     // archiving complete
     $scope.archivingComplete = {

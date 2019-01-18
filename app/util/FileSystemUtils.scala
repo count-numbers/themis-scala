@@ -18,6 +18,10 @@ object FileSystemUtils {
     storageDir.map(_.resolve(s"${attachmentId}.thumb"))
   }
 
+  def previewPath(attachmentId: Int)(implicit config: Configuration): Option[Path] = {
+    storageDir.map(_.resolve(s"${attachmentId}.preview"))
+  }
+
   def attachmentPath(attachmentId: Int)(implicit config: Configuration): Option[Path] = {
     storageDir.map(_.resolve(s"${attachmentId}.attachment"))
   }

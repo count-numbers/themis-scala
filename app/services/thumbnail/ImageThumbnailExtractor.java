@@ -25,12 +25,12 @@ public class ImageThumbnailExtractor implements ThumbnailExtractor {
 	}
 
 	@Override
-	public void extractFromFile(Path srcPath, Path thumbPath) throws IOException {
+	public void extractFromFile(Path srcPath, Path thumbPath, int maxWidth, int maxHeight) throws IOException {
 		BufferedImage srcImage = ImageIO.read(srcPath.toFile());
 
 		double aspectRatio = (double)srcImage.getWidth() / (double)srcImage.getHeight();
-		double imgWidth = THUMBNAIL_SIZE;
-		double imgHeight = THUMBNAIL_SIZE;
+		double imgWidth = maxWidth;
+		double imgHeight = maxHeight;
 		if (aspectRatio > 1) { // portrait
 			imgHeight = imgWidth / aspectRatio;
 		} else {

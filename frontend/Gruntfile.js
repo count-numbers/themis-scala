@@ -79,9 +79,9 @@ module.exports = function(grunt) {
     		      'app/bower_components/angular-cookies/angular-cookies.min.js',
     		      'app/bower_components/angular-animate/angular-animate.min.js',
     		      'app/bower_components/ng-tags-input/ng-tags-input.min.js',
-    		      'app/bower_components/angular-xeditable/dist/js/xeditable.min.js',
     		      'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
-    		      
+    		      'app/bower_components/angular-xeditable/dist/js/xeditable.min.js',
+
     		      'app/bower_components/bootstrap/dist/js/bootstrap.min.js',
     		      'app/bower_components/bootstrap-growl/jquery.bootstrap-growl.min.js',
     		      'app/bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js',

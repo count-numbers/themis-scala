@@ -29,6 +29,7 @@ GET     /rest/v1/documents                              controllers.DocumentCont
 # Attachments
 GET     /rest/v1/attachment/:id/body                    controllers.AttachmentController.download(id: Int)
 GET     /rest/v1/attachment/:id/thumbnail               controllers.AttachmentController.thumbnail(id: Int)
+GET     /rest/v1/attachment/:id/preview                 controllers.AttachmentController.preview(id: Int)
 
 # Contacts
 GET     /rest/v1/contact/:id/documents                  controllers.ContactController.getDocumentsForContact(id: Int, offset: Option[Int], limit: Option[Int])

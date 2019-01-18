@@ -3,9 +3,10 @@
 		<tr ng-repeat="document in documents">
 			<td>
 				<span class="thumb-with-icons">
-					<img
+					<img ng-show="document.thumbnailId"
 							ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + document.thumbnailId + '/thumbnail'}}"
 							alt="{{attachment.name}}" class="thumbnail"/>
+					<img ng-hide="document.thumbnailId" alt="Thumbnail missing" class="thumbnail" src="/static/img/unavailable-200.png"/>
 					<span class="badge-over-thumb">
 						<span ng-show="document.actionRequired" class="glyphicon glyphicon-exclamation-sign action-required"></span>
 						<span ng-hide="document.archivingComplete" class="glyphicon glyphicon-question-sign archiving-incomplete"></span>
@@ -18,6 +19,8 @@
 					<dms-document doc-id="document.id" name="document.name"></dms-document>
 				</h3>
 				<div>
+					<span class="glyphicon glyphicon-envelope"></span>
+					<a href="#/contact/{{document.contact.id}}">{{document.contact.name}}</a>
 					<span class="glyphicon glyphicon-time"></span>
 					<time>{{document.archiveTimestamp | date:'yyyy-MM-dd HH:mm'}}</time>
 					<span class="glyphicon glyphicon-user"></span>
