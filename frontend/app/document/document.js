@@ -20,6 +20,7 @@ angular.module('dms.document', ['ngRoute'])
 		} else {
 		    $scope.currentAttachment = null;
 		}
+		$scope.documentDate.date = $scope.document.documentDate ? new Date($scope.document.documentDate) : null;
 	}
 
 	$scope.currentAttachment = null;
@@ -73,16 +74,34 @@ angular.module('dms.document', ['ngRoute'])
     			});
     	return true;
     };
-    $scope.setDocumentDate = function($data) {
-    	Document.update({id:$routeParams.docid, documentDate:$data},
-    			function(updatedDocument) {
-    				$scope.document = updatedDocument;
-    				$scope.documentUpdated();
-    			},
-    			function (response) {
-    				Errors.add(response);
-    			});
-    	return true;
+
+
+    $scope.documentDate = {
+        datePickerOpen: false,
+        toggleDatePicker: function($event) {
+            $scope.documentDate.datePickerOpen = !$scope.documentDate.datePickerOpen;
+        },
+        date: null,
+        submitting: false,
+        changed: function(date) {
+           var newDateStr;
+           if ($scope.documentDate.date) {
+               newDateStr = $scope.documentDate.date.getFullYear()+"-"+($scope.documentDate.date.getMonth()+1)+"-"+$scope.documentDate.date.getDate();
+           } else {
+                newDateStr = "";
+           }
+           $scope.documentDate.submitting = true;
+           Document.update({id:$routeParams.docid, documentDate:newDateStr},
+               function(updatedDocument) {
+                   $scope.document = updatedDocument;
+                   $scope.documentUpdated();
+                   $scope.documentDate.submitting = false;
+               },
+               function (response) {
+                   Errors.add(response);
+                   $scope.documentDate.submitting = false;
+           });
+        }
     }
 
     // archiving complete

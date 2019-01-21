@@ -143,9 +143,16 @@
                             <tr>
                                 <td>Document date</td>
                                 <td>
-                                    <a href="#" editable-text="document.documentDate" onBeforeSave="setDocumentDate($data)">
+                                    <a
+                                       ng-click="documentDate.toggleDatePicker()"
+                                       datepicker-popup="dd.MM.yyyy"
+                                       ng-model="documentDate.date"
+                                       ng-change="documentDate.changed()"
+                                       is-open="documentDate.datePickerOpen"
+                                       >
                                         {{ document.documentDate || "[none]" }}
                                     </a>
+                                    <dms-loading-indicator loading="documentDate.submitting"></dms-loading-indicator>
                                 </td>
                             </tr>
 
