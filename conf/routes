@@ -27,7 +27,7 @@ GET     /rest/v1/documents/meta                         controllers.MetaControll
 GET     /rest/v1/documents                              controllers.DocumentController.search(q: String, fromArchiveTimestamp: Option[Long], toArchiveTimestamp: Option[Long], fromModificationTimestamp: Option[Long], toModificationTime: Option[Long], offset: Option[Int], limit: Option[Int])
 
 # Attachments
-GET     /rest/v1/attachment/:id/body                    controllers.AttachmentController.download(id: Int)
+GET     /rest/v1/attachment/:id/body                    controllers.AttachmentController.download(id: Int, as: Option[String])
 GET     /rest/v1/attachment/:id/thumbnail               controllers.AttachmentController.thumbnail(id: Int)
 GET     /rest/v1/attachment/:id/preview                 controllers.AttachmentController.preview(id: Int)
 

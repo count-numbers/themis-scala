@@ -29,7 +29,7 @@ class AttachmentController @Inject()(attachmentRepository: AttachmentRepository,
 
 
 
-  def download(id: Int) = AuthAction().async {
+  def download(id: Int, as: Option[String]) = AuthAction().async {
     request => {
       for {
         attachment: Option[Attachment] <- attachmentRepository.getById(id)
@@ -40,10 +40,11 @@ class AttachmentController @Inject()(attachmentRepository: AttachmentRepository,
             pathOpt.map(path => {
               Logger.debug(s"Streaming ${path}.")
               val source: Source[ByteString, _] = FileIO.fromPath(path)
-              Result(
+                Result(
                 header = ResponseHeader(200, Map.empty),
                 body = HttpEntity.Streamed(source, Some(attachment.size), Some(attachment.mimeType))
-              )
+              ).withHeaders(("Content-Disposition",
+                  if (as == Some("attachment")) s"attachment; filename=${attachment.name}" else "inline"))
             }).getOrElse(NotFound(ErrorResponse(404, "Not found", s"Attachment file not found for ${id}")))
           }
           case _ => NotFound(ErrorResponse(404, "Not found", s"No such attachment ${id}"))
@@ -78,8 +79,7 @@ class AttachmentController @Inject()(attachmentRepository: AttachmentRepository,
                 Logger.debug(s"Streaming ${path}.")
                 Result(
                   header = ResponseHeader(200, Map.empty),
-                  body = HttpEntity.Streamed(source, Some(Files.size(path)), Some("image/png"))
-                )
+                  body = HttpEntity.Streamed(source, Some(Files.size(path)), Some("image/png")))
               } else {
                 TemporaryRedirect(s"/static/img/unavailable-${daType.width}.png")
                 //NotFound(ErrorResponse(404, "Not found", s"Thumbnail not generated for ${id}"))

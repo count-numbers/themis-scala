@@ -54,19 +54,24 @@
                     <dms-editable-markup value="{{document.description}}"
                                          submit="submitDescription(value)"></dms-editable-markup>
                 </div>
-                <img ng-if="currentAttachment != null"
-                        ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/preview'}}"
-                        alt="{{currentAttachment.name}}"
-                        class="preview">
-                <a href="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/body'}}">
-                    <div class="caption">
-                        <div>
-                            <span class="glyphicon glyphicon-download"></span>
+                <div class="preview-container">
+                    <img ng-if="currentAttachment != null"
+                            ng-src="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/preview'}}"
+                            alt="{{currentAttachment.name}}"
+                            class="preview">
+                    <div class="preview-actions">
+                        <span class="caption">
                             <span class="attachment-name"> {{currentAttachment.name}} </span>
                             ({{currentAttachment.size}} bytes)
-                        </div>
+                        </span>
+                        <a class="pull-right button" href="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/body?as=attachment'}}">
+                            <span class="glyphicon glyphicon-download"></span>
+                        </a>
+                        <a class="pull-right button" href="{{configuration.backendURL + 'rest/v1/attachment/' + currentAttachment.id + '/body'}}">
+                            <span class="glyphicon glyphicon-fullscreen"></span>
+                        </a>
                     </div>
-                </a>
+                </div>
 
 
                 <div class="preview-tabs">

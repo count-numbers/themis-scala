@@ -15,8 +15,46 @@
     }
 }
 
-.preview {
-    width:95%;
+.preview-container {
+    position:relative;
+    text-align:center;
+
+    .preview {
+        width:95%;
+    }
+    .preview-actions {
+        position:absolute;
+        display:none;
+        top: 0;
+        width:100%;
+        background-color:rgba(0.5,0.5,0.5,0.5);
+        color:white;
+        padding:0ex;
+        text-align:center;
+
+        a {
+            color:white;
+        }
+
+        .button {
+            padding:2ex;
+        }
+        .button:hover {
+            background-color:rgba(0.8,0.8,0.8,0.5);
+        }
+        .caption {
+            padding:2ex;
+            display:inline-block;
+            .attachment-name {
+                font-weight:bold;
+            }
+        }
+
+    }
+}
+
+.preview-container:hover .preview-actions {
+    display:block;
 }
 
 .thumbnail .attachment-name {
